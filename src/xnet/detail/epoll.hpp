@@ -532,24 +532,32 @@ namespace epoll
 				}
 				else if(n == 0) 
 					continue;
-				for(int i = 0; i < n; i++)
+				try
 				{
-					event_context *event_ctx =
-						(event_context*)events_[i].data.ptr;
-					xnet_assert(event_ctx);
-					if(event_ctx->socket_ == -1)
-						continue;
-					if(events_[i].events & (EPOLLERR | EPOLLHUP))
-						except_callback(event_ctx);
-					if(event_ctx->socket_ == -1)
-						continue;
-					if(events_[i].events & EPOLLIN)
-						readable_callback(event_ctx);
-					if(event_ctx->socket_ == -1)
-						continue;
-					if(events_[i].events & EPOLLOUT)
-						writeable_callback(event_ctx);
+					for (int i = 0; i < n; i++)
+					{
+						event_context *event_ctx =
+							(event_context*)events_[i].data.ptr;
+						xnet_assert(event_ctx);
+						if (event_ctx->socket_ == -1)
+							continue;
+						if (events_[i].events & (EPOLLERR | EPOLLHUP))
+							except_callback(event_ctx);
+						if (event_ctx->socket_ == -1)
+							continue;
+						if (events_[i].events & EPOLLIN)
+							readable_callback(event_ctx);
+						if (event_ctx->socket_ == -1)
+							continue;
+						if (events_[i].events & EPOLLOUT)
+							writeable_callback(event_ctx);
+					}
 				}
+				catch (const std::exception& e)
+				{
+					std::cout << e << std::endl;
+				}
+				
 				if(del_event_ctx_.size())
 				{
 					for (auto itr: del_event_ctx_)

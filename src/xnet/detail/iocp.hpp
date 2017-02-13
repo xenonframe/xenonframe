@@ -212,6 +212,9 @@ namespace iocp
 			xnet_assert(::CreateIoCompletionPort((HANDLE)socket_, iocp_, 0, 0) == iocp_);
 		}
 		friend class proactor_impl;
+		friend class acceptor_impl;
+		friend class connector_impl;
+
 		void recv_callbak(bool status)
 		{
 			recv_overlapped_->status_ = overLapped_context::e_idle;
@@ -342,6 +345,12 @@ namespace iocp
 				sizeof(socket_)) == 0);
 			connection_impl *conn = new connection_impl(accept_socket_);
 			conn->set_iocp(IOCP_);
+			conn->set_timer_ = [this](auto &&...args) {
+				return timer_manager_->set_timer(std::forward<decltype(args)>(args)...);
+			};
+			conn->cancel_timer_ = [this](auto &&...args) {
+				return timer_manager_->cancel_timer(std::forward<decltype(args)>(args)...);
+			};
 			xnet_assert(accept_callback_);
 			accept_socket_ = INVALID_SOCKET;
 			do_accept();
@@ -381,6 +390,7 @@ namespace iocp
 		SOCKET socket_ = INVALID_SOCKET;
 		SOCKET accept_socket_ = INVALID_SOCKET;
 		HANDLE IOCP_ = nullptr;
+		timer_manager *timer_manager_;
 		overLapped_context *overLapped_context_ = nullptr;
 		accept_callback_t accept_callback_;
 	};
@@ -492,9 +502,17 @@ namespace iocp
 			}
 			SOCKET sock = socket_;
 			socket_ = INVALID_SOCKET;
-			success_callback_(new connection_impl(sock));
+			auto conn = new connection_impl(sock);
+			conn->set_timer_ = [this](auto &&...args) {
+				return timer_manager_->set_timer(std::forward<decltype(args)>(args)...);
+			};
+			conn->cancel_timer_ = [this](auto &&...args) {
+				return timer_manager_->cancel_timer(std::forward<decltype(args)>(args)...);
+			};
+			success_callback_(conn);
 		}
 		overLapped_context *overLapped_context_;
+		timer_manager *timer_manager_;
 		LPFN_CONNECTEX connectex_func_ = nullptr;
 		SOCKET socket_ = INVALID_SOCKET;
 		success_callback_t success_callback_;
@@ -571,19 +589,21 @@ namespace iocp
 			PostQueuedCompletionStatus(iocp_,0,(ULONG_PTR)this, 
 				(LPOVERLAPPED)overlapped);
 		}
-		acceptor_impl *get_acceptor() const
+		acceptor_impl *get_acceptor()
 		{
-			acceptor_impl *acceptor = new acceptor_impl;
+			acceptor_impl *obj = new acceptor_impl;
 			xnet_assert(iocp_);
-			acceptor->IOCP_ = iocp_;
-			return acceptor;
+			obj->IOCP_ = iocp_;
+			obj->timer_manager_ = &timer_manager_;
+			return obj;
 		}
 		connector_impl *get_connector()
 		{
-			connector_impl *acceptor = new connector_impl;
+			connector_impl *obj = new connector_impl;
 			xnet_assert(iocp_);
-			acceptor->iocp_ = iocp_;
-			return acceptor;
+			obj->iocp_ = iocp_;
+			obj->timer_manager_ = &timer_manager_;
+			return obj;
 		}
 		template<typename T>
 		timer_id set_timer(std::size_t timeout, T &&timer_callback)

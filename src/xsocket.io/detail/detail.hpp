@@ -3,10 +3,10 @@
 #include <functional>
 #include <string>
 #include <fstream>
-#include "../../../xwebsocket/include/websocket.hpp"
-#include "../../../xhttper/include/query.hpp"
-#include "../../../xjson/include/xjson.hpp"
-#include "../../../xcoroutine/include/xcoroutine.hpp"
-#include "../../../xutil/include/vfs.hpp"
+#include "../xwebsocket/websocket.hpp"
+#include "../xhttper/query.hpp"
+#include "../xjson/xjson.hpp"
+#include "../xcoroutine/xcoroutine.hpp"
+#include "../xutil/vfs.hpp"
 #include "errors.hpp"
 #include "protoc.hpp"

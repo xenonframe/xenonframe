@@ -7,7 +7,7 @@ CFLAGS = -g -W \
 -Wformat \
 -Winvalid-pch \
 -std=c++1z \
--I ./../include \
+-I ../../src\
 -l pthread
 server:rm_server
 	g++ main.cpp $(CFLAGS) -o xhttp_server

@@ -19,16 +19,20 @@
 
 //deps
 
-#include "../../../../xsimple_rpc/include/xsimple_rpc.hpp"
-#include "../../../../xutil/include/vfs.hpp"
-#include "../../../../xutil/include/file_stream.hpp"
-#include "../../../../xutil/include/guard.hpp"
+#include "../xsimple_rpc/xsimple_rpc.hpp"
+#include "../xutil/vfs.hpp"
+#include "../xutil/file_stream.hpp"
+#include "../xutil/guard.hpp"
 #ifdef _MSC_VER
 #include<windows.h> 
 #endif
 
 #define FILE_LINE \
-(std::string("[ FILE:") + __FILE__ + " LINE: " + std::to_string(__LINE__)+" ] ")
+(std::string("[ FILE:") + \
+__FILE__ + \
+" LINE: " + \
+std::to_string(__LINE__)+\
+" ] ")
 
 #include "endec.hpp"
 #include "raft_proto.hpp"

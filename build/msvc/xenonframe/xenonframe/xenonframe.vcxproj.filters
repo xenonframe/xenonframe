@@ -19,6 +19,66 @@
     <Filter Include="xhttp_client\detail">
       <UniqueIdentifier>{029f62b3-9490-4363-9222-a7ac5c540aee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="xhttp_server">
+      <UniqueIdentifier>{ac3795c7-4d15-47b4-bb7f-29d3a8bc6b72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xhttp_server\detail">
+      <UniqueIdentifier>{3346d9a7-da90-45d9-868d-c63d92711990}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xhttp_server\middleware">
+      <UniqueIdentifier>{f801716b-7599-486c-a22e-e89f06f9486b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xhttper">
+      <UniqueIdentifier>{c59f831d-456c-4141-88ca-d96d3265fe32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xjson">
+      <UniqueIdentifier>{ac91f7bb-f9e9-4dde-9135-d1de5d96d66c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlog">
+      <UniqueIdentifier>{a4c4d92a-c0c9-4881-91a4-2812827ac754}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xmqtt">
+      <UniqueIdentifier>{4a3ffb58-c237-4a73-8b7d-3a0e144b9870}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xraft">
+      <UniqueIdentifier>{673e00b9-71e0-41a7-9faf-1d4f2c38ba00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xmqtt\detail">
+      <UniqueIdentifier>{a8c07492-bb66-44dd-982f-47c5d7983107}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xraft\detail">
+      <UniqueIdentifier>{d36adfc1-b9a8-4dff-8ecb-4c84f9340fbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xredis">
+      <UniqueIdentifier>{8679315f-532b-40bc-883f-32a76a43c5ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xredis\detail">
+      <UniqueIdentifier>{cffa7a8e-d1a8-4734-98ab-87d4a2cb7e7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xsimple_rpc">
+      <UniqueIdentifier>{161a2d08-f34b-4605-98a6-0d3c6454b5a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xsimple_rpc\detail">
+      <UniqueIdentifier>{1c1a49a8-8850-43af-8d6f-439d4e543cbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xsocket.io">
+      <UniqueIdentifier>{16c05c30-a5dd-4ac6-9701-e7a564df5121}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xsocket.io\detail">
+      <UniqueIdentifier>{ed3d8d7b-df79-4522-b693-94a10334df8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xtest">
+      <UniqueIdentifier>{885ee6fc-1bd1-435f-bef1-decf983ea810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xutil">
+      <UniqueIdentifier>{831b262f-d029-46ce-bef9-0b20e77afa57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xutil\detail">
+      <UniqueIdentifier>{8ba99d88-e938-4fd8-9fd4-2a2dbcdf61ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xwebsocket">
+      <UniqueIdentifier>{ecf4cc18-7efb-469a-81e2-6556023ae947}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\xnet\detail\functional.hpp">
@@ -83,6 +143,294 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\xhttp_client\client_maker.hpp">
       <Filter>xhttp_client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_server\detail\detail.hpp">
+      <Filter>xhttp_server\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_server\middleware\async\async.hpp">
+      <Filter>xhttp_server\middleware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_server\middleware\redis_session\xsession.hpp">
+      <Filter>xhttp_server\middleware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_server\response.hpp">
+      <Filter>xhttp_server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_server\uploader.hpp">
+      <Filter>xhttp_server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_server\xhttp_server.hpp">
+      <Filter>xhttp_server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_server\downloader.hpp">
+      <Filter>xhttp_server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_server\filelist.hpp">
+      <Filter>xhttp_server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_server\request.hpp">
+      <Filter>xhttp_server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttper\http_parser.hpp">
+      <Filter>xhttper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttper\mime_parser.hpp">
+      <Filter>xhttper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttper\query.hpp">
+      <Filter>xhttper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttper\http_builder.hpp">
+      <Filter>xhttper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xjson\xjson.hpp">
+      <Filter>xjson</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xlog\xlog.hpp">
+      <Filter>xlog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xmqtt\xmqtt.hpp">
+      <Filter>xmqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xmqtt\detail\proto.hpp">
+      <Filter>xmqtt\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xmqtt\detail\msg_packer.hpp">
+      <Filter>xmqtt\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xmqtt\detail\msg_parser.hpp">
+      <Filter>xmqtt\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xmqtt\detail\check_ut8.hpp">
+      <Filter>xmqtt\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\committer.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\detail.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\endec.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\filelog.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\functors.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\metadata.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\raft_configuration.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\raft_peer.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\raft_proto.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\snapshot.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\timer.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\detail\utils.hpp">
+      <Filter>xraft\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xraft\raft.hpp">
+      <Filter>xraft</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\detail\client.hpp">
+      <Filter>xredis\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\detail\cmd_builder.hpp">
+      <Filter>xredis\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\detail\detail.hpp">
+      <Filter>xredis\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\detail\functional.hpp">
+      <Filter>xredis\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\detail\reply_parser.hpp">
+      <Filter>xredis\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\set.hpp">
+      <Filter>xredis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\string.hpp">
+      <Filter>xredis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\xredis.hpp">
+      <Filter>xredis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\callback_func.hpp">
+      <Filter>xredis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\hash.hpp">
+      <Filter>xredis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\list.hpp">
+      <Filter>xredis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\pubsub.hpp">
+      <Filter>xredis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xredis\reply_entry.hpp">
+      <Filter>xredis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\detail.hpp">
+      <Filter>xsimple_rpc\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\endec.hpp">
+      <Filter>xsimple_rpc\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\func_register.hpp">
+      <Filter>xsimple_rpc\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\gen_endec.hpp">
+      <Filter>xsimple_rpc\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\rpc_req.hpp">
+      <Filter>xsimple_rpc\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\rpc_session.hpp">
+      <Filter>xsimple_rpc\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\rpc_proactor_pool.hpp">
+      <Filter>xsimple_rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\rpc_server.hpp">
+      <Filter>xsimple_rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\xsimple_rpc.hpp">
+      <Filter>xsimple_rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\async_client.hpp">
+      <Filter>xsimple_rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\rpc_client.hpp">
+      <Filter>xsimple_rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsimple_rpc\rpc_error.hpp">
+      <Filter>xsimple_rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsocket.io\xserver.hpp">
+      <Filter>xsocket.io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsocket.io\xsocket.io.hpp">
+      <Filter>xsocket.io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsocket.io\build_resp.hpp">
+      <Filter>xsocket.io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsocket.io\request.hpp">
+      <Filter>xsocket.io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsocket.io\socket.hpp">
+      <Filter>xsocket.io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsocket.io\detail\detail.hpp">
+      <Filter>xsocket.io\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsocket.io\detail\errors.hpp">
+      <Filter>xsocket.io\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xsocket.io\detail\protoc.hpp">
+      <Filter>xsocket.io\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xtest\xtest.hpp">
+      <Filter>xtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\detail\file_stream_impl.hpp">
+      <Filter>xutil\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\detail\unix_file_stream.hpp">
+      <Filter>xutil\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\detail\unix_vfs.hpp">
+      <Filter>xutil\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\detail\vfs_impl.hpp">
+      <Filter>xutil\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\detail\win_file_stream.hpp">
+      <Filter>xutil\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\detail\win_vfs.hpp">
+      <Filter>xutil\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\vfs.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\xworker.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\xworker_pool.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\ypipe.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\yqueue.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\base64.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\file_stream.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\function_traits.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\functional.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\guard.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\has_member_traits.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\make_index_sequence.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\md5.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\no_copy_able.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\sha1.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\sync_queue.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xwebsocket\session.hpp">
+      <Filter>xwebsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xwebsocket\websocket.hpp">
+      <Filter>xwebsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xwebsocket\xserver.hpp">
+      <Filter>xwebsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xwebsocket\frame.hpp">
+      <Filter>xwebsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xwebsocket\frame_builder.hpp">
+      <Filter>xwebsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xwebsocket\frame_parser.hpp">
+      <Filter>xwebsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xwebsocket\make_handshake.hpp">
+      <Filter>xwebsocket</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

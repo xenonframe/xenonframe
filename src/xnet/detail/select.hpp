@@ -445,21 +445,27 @@ namespace select
 
 				if (rc == 0)
 					continue;
-
-				for (fd_context_vec::size_type i = 0; i < fd_ctxs_.size(); i++)
+				try
 				{
-					if (fd_ctxs_[i].socket_ == INVALID_SOCKET)
-						continue;
-					if (FD_ISSET(fd_ctxs_[i].socket_, &except_fds_))
-						except_callback(fd_ctxs_[i]);
-					if (fd_ctxs_[i].socket_ == INVALID_SOCKET)
-						continue;
-					if (FD_ISSET(fd_ctxs_[i].socket_, &send_fds_))
-						writeable_callback(fd_ctxs_[i]);
-					if (fd_ctxs_[i].socket_ == INVALID_SOCKET)
-						continue;
-					if (FD_ISSET(fd_ctxs_[i].socket_, &recv_fds_))
-						readable_callback(fd_ctxs_[i]);
+					for (fd_context_vec::size_type i = 0; i < fd_ctxs_.size(); i++)
+					{
+						if (fd_ctxs_[i].socket_ == INVALID_SOCKET)
+							continue;
+						if (FD_ISSET(fd_ctxs_[i].socket_, &except_fds_))
+							except_callback(fd_ctxs_[i]);
+						if (fd_ctxs_[i].socket_ == INVALID_SOCKET)
+							continue;
+						if (FD_ISSET(fd_ctxs_[i].socket_, &send_fds_))
+							writeable_callback(fd_ctxs_[i]);
+						if (fd_ctxs_[i].socket_ == INVALID_SOCKET)
+							continue;
+						if (FD_ISSET(fd_ctxs_[i].socket_, &recv_fds_))
+							readable_callback(fd_ctxs_[i]);
+					}
+				}
+				catch (const std::exception&)
+				{
+					std::cout << e.what() << std::endl;
 				}
 
 				if (retired)

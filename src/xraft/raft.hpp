@@ -1,6 +1,5 @@
 #pragma once
 #include "detail/detail.hpp"
-#define TRACE std::cout <<__FUNCTION__ <<std::endl;
 namespace xraft
 {
 	using namespace detail;
@@ -433,7 +432,6 @@ namespace xraft
 
 		void handle_new_term(int64_t new_term)
 		{
-			TRACE;
 			std::lock_guard<std::mutex> locker(mtx_);
 			step_down(new_term);
 		}
@@ -483,7 +481,6 @@ namespace xraft
 		}
 		void sleep_peer_threads()
 		{
-			TRACE;
 			std::cout << "-----------------------" << std::endl;
 			for (auto &itr : pees_)
 				itr->send_cmd(raft_peer::cmd_t::e_sleep);
@@ -574,7 +571,6 @@ namespace xraft
 		}
 		void handle_vote_response(const vote_response &response)
 		{
-			TRACE;
 			std::lock_guard<std::mutex> locker(mtx_);
 			if (state_ != e_candidate)
 			{
@@ -598,7 +594,6 @@ namespace xraft
 		}
 		void become_leader()
 		{
-			TRACE;
 			state_ = e_leader;
 			cancel_election_timer();
 			for (auto &itr : pees_)
@@ -611,7 +606,6 @@ namespace xraft
 		}
 		vote_request build_vote_request()
 		{
-			TRACE;
 			vote_request request;
 			request.candidate_ = myself_.raft_id_;
 			request.term_ = current_term_;

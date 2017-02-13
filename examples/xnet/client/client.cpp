@@ -1,4 +1,4 @@
-#include "../../include/xnet.hpp"
+#include "xnet/xnet.hpp"
 
 int main()
 {
