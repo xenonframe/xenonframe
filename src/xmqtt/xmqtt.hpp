@@ -1,0 +1,12 @@
+#pragma once
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <memory>
+#include <cassert>
+#include <functional>
+#include <algorithm>
+#include "detail\check_ut8.hpp"
+#include "detail\proto.hpp"
+#include "detail\msg_packer.hpp"
+#include "detail\msg_parser.hpp"

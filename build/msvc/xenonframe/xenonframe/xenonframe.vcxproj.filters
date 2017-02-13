@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="xnet">
+      <UniqueIdentifier>{e1fe29c4-7f35-4c47-a3d7-699f59545563}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xnet\detail">
+      <UniqueIdentifier>{9c27a140-4479-470d-ad27-614c40a03e91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xasync">
+      <UniqueIdentifier>{b519dd3a-144b-4f20-b385-9b0cf9e3010a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xcoroutine">
+      <UniqueIdentifier>{9127d264-bc2b-43f2-8ef4-1296ebfa755b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xhttp_client">
+      <UniqueIdentifier>{82a9e559-4c03-419c-a244-63a31b767918}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xhttp_client\detail">
+      <UniqueIdentifier>{029f62b3-9490-4363-9222-a7ac5c540aee}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\xnet\detail\functional.hpp">
+      <Filter>xnet\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\detail\iocp.hpp">
+      <Filter>xnet\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\detail\select.hpp">
+      <Filter>xnet\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\detail\timer.hpp">
+      <Filter>xnet\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\detail\detail.hpp">
+      <Filter>xnet\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\detail\epoll.hpp">
+      <Filter>xnet\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\detail\exceptions.hpp">
+      <Filter>xnet\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\connection.hpp">
+      <Filter>xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\connector.hpp">
+      <Filter>xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\msgbox.hpp">
+      <Filter>xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\proactor.hpp">
+      <Filter>xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\proactor_pool.hpp">
+      <Filter>xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\xnet.hpp">
+      <Filter>xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xnet\acceptor.hpp">
+      <Filter>xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xasync\xasync.hpp">
+      <Filter>xasync</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xcoroutine\xcoroutine.hpp">
+      <Filter>xcoroutine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_client\detail\detail.hpp">
+      <Filter>xhttp_client\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_client\downloader.hpp">
+      <Filter>xhttp_client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_client\response.hpp">
+      <Filter>xhttp_client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_client\xhttp_client.hpp">
+      <Filter>xhttp_client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xhttp_client\client_maker.hpp">
+      <Filter>xhttp_client</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
