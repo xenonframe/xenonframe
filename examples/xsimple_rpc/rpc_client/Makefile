@@ -7,11 +7,11 @@ CFLAGS = -g -W \
 -Wformat \
 -Winvalid-pch \
 -std=c++1z \
--I ./../../include \
+-I ../../../src \
 -l pthread
 
 client:rm
-	g++ rpc_client.cpp $(CFLAGS) -o rpc_client 
+	g++ main.cpp $(CFLAGS) -o rpc_client 
 rm:
 	$(shell if [ -f rpc_client ]; then rm rpc_client; fi;)
 

@@ -1,10 +1,9 @@
 #include <type_traits>
 #include <vector>
-#include "../include/xsimple_rpc.hpp"
-#include "../../xtest/include/xtest.hpp"
-xtest_run;
+#include "xsimple_rpc/xsimple_rpc.hpp"
+#include "xtest/xtest.hpp"
 
-#if 0
+XTEST_MAIN;
 
 struct MyStruct
 {
@@ -59,7 +58,7 @@ XTEST_SUITE(endnc)
 		obj.xencode(ptr);
 
 		ptr = (uint8_t *)buffer.data();
-		ob2.xdecode(ptr);
+		ob2.xdecode(ptr, ptr + buffer.size());
 
 		xassert(obj.hello== ob2.hello);
 		xassert(obj.world == ob2.world);
@@ -84,7 +83,7 @@ XTEST_SUITE(endnc)
 		endec::put(ptr, map);
 
 		ptr = (uint8_t *)buffer.data();
-		auto res = endec::get<decltype(map)>(ptr);
+		auto res = endec::get<decltype(map)>(ptr, ptr + buffer.size());
 	}
 
 	XUNIT_TEST(set_put)
@@ -107,7 +106,7 @@ XTEST_SUITE(endnc)
 		endec::put(ptr, obj);
 
 		ptr = (uint8_t *)buffer.data();
-		auto res = endec::get<decltype(obj)>(ptr);
+		auto res = endec::get<decltype(obj)>(ptr, ptr+ buffer.size());
 	}
 
 	XUNIT_TEST(list_put)
@@ -130,7 +129,7 @@ XTEST_SUITE(endnc)
 		endec::put(ptr, obj);
 
 		ptr = (uint8_t *)buffer.data();
-		auto res = endec::get<decltype(obj)>(ptr);
+		auto res = endec::get<decltype(obj)>(ptr, ptr + buffer.size());
 	}
 
 	XUNIT_TEST(pair_put)
@@ -153,7 +152,7 @@ XTEST_SUITE(endnc)
 		endec::put(ptr, obj);
 
 		ptr = (uint8_t *)buffer.data();
-		auto res = endec::get<decltype(obj)>(ptr);
+		auto res = endec::get<decltype(obj)>(ptr, ptr + buffer.size());
 	}
 }
 XTEST_SUITE(rpc_server)
@@ -166,8 +165,8 @@ XTEST_SUITE(rpc_server)
 		obj.hello = "hello";
 		obj.world = 192982772;
 		obj.ints = { 1,2,3,4,5 };
-
-		rpc_server rpc_server_;
+		rpc_proactor_pool rpc_proactor_pool_;
+		rpc_server rpc_server_(rpc_proactor_pool_);
 		rpc_server_.regist("hello world", [](int)->std::string { return{}; });
 		rpc_server_.regist("func", &MyStruct::func, obj);
 		rpc_server_.regist("func2", &MyStruct::func2, obj);
@@ -175,7 +174,6 @@ XTEST_SUITE(rpc_server)
 		rpc_server_.regist("get_mystruct", [&] {return obj; });
 	}
 }
-#endif
 XTEST_SUITE(async_client)
 {
 }

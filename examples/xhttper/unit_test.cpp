@@ -4,7 +4,7 @@
 #include "xhttper/http_builder.hpp"
 #include <thread>
 #include <iostream>
-xtest_run;
+XTEST_MAIN;
 
 using namespace xutil::functional;
 XTEST_SUITE(xhttper)

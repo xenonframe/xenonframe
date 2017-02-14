@@ -1,7 +1,7 @@
-#include "../../xtest/include/xtest.hpp"
-#include "../include/xjson.hpp"
+#include "xtest/xtest.hpp"
+#include "xjson/xjson.hpp"
 
-xtest_run;
+XTEST_MAIN;
 
 using namespace xjson;
 XTEST_SUITE(xjson)

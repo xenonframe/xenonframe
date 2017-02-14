@@ -162,7 +162,7 @@ public:\
 
 #define  xassert(x) if (!(x)) throw xtest::xtest_excetion(__FILE__, __LINE__, "xassert( "#x" ) failed !");
 
-#define xtest_run \
+#define XTEST_MAIN \
 int main()\
 {\
 	xtest::xtest::get_inst().run_test();\

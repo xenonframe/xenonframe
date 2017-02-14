@@ -852,10 +852,20 @@ namespace epoll
 				auto bytes = ::recv(io_ctx.socket_,
 					(char*)io_ctx.buffer_.data() + io_ctx.recv_bytes_,
 					(int)(len - io_ctx.recv_bytes_), 0);
-				if(bytes <= 0)
+				if(bytes == 0)
 				{
 					io_ctx.connection_->recv_callback(false);
 					return;
+				}
+				else if (bytes == -1)
+				{
+					xnet_assert(errno != EBADF
+						&& errno != EFAULT
+						&& errno != EINVAL
+						&& errno != ENOMEM
+						&& errno != ENOTSOCK);
+					if (errno == EWOULDBLOCK || errno == EINTR)
+						return;
 				}
 				io_ctx.recv_bytes_ += bytes;
 				if(io_ctx.to_recv_ <= io_ctx.recv_bytes_)
@@ -883,7 +893,10 @@ namespace epoll
 				auto bytes = ::send(io_ctx.socket_,
 					(char*)io_ctx.buffer_.data() + io_ctx.send_bytes_,
 					io_ctx.to_send_ - io_ctx.send_bytes_, 0);
-				if(bytes <= 0)
+
+				if(bytes == -1 && !(errno == EAGAIN ||
+					errno == EWOULDBLOCK ||
+					errno == EINTR))
 				{
 					io_ctx.connection_->send_callback(false);
 					return;
@@ -908,7 +921,6 @@ namespace epoll
 				io_ctx.send_bytes_ += bytes;
 				if(io_ctx.to_send_ == io_ctx.send_bytes_)
 				{
-					shutdown(event_ctx->socket_, SHUT_WR);
 					unregist_event_context(event_ctx);
 					return;
 				}

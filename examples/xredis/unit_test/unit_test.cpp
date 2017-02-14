@@ -1,5 +1,8 @@
-#include "../include/xredis.hpp"
-#if 0
+#include "xredis/xredis.hpp"
+#include "xtest/xtest.hpp"
+
+XTEST_MAIN;
+
 XTEST_SUITE(reply_parser)
 {
 	XUNIT_TEST(parse)
@@ -47,23 +50,3 @@ XTEST_SUITE(xredis)
 		xassert(masters.size() == 2);
 	}
 }
-XTEST_SUITE(map)
-{
-	XUNIT_TEST(lower_bound)
-	{
-		std::map<char, int> mymap;
-		std::map<char, int>::iterator itlow, itup;
-
-		mymap[20] = 20;
-		mymap[40] = 40;
-		mymap[60] = 60;
-		mymap[80] = 80;
-		mymap[100] = 100;
-
-		itlow = mymap.lower_bound(10); 
-		xassert(itlow->second == 20);
-		itup = mymap.lower_bound(30);
-		xassert(itup->second == 40);
-	}
-}
-#endif 

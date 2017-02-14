@@ -418,6 +418,7 @@ namespace select
 		typedef std::vector <fd_context> fd_context_vec;
 
 	public:
+		typedef timer_manager::timer_id timer_id;
 		proactor_impl()
 		{
 
@@ -463,7 +464,7 @@ namespace select
 							readable_callback(fd_ctxs_[i]);
 					}
 				}
-				catch (const std::exception&)
+				catch (const std::exception&e)
 				{
 					std::cout << e.what() << std::endl;
 				}
@@ -658,9 +659,12 @@ namespace select
 				}
 			}
 			if (maxfd_ == INVALID_SOCKET)
+			{
 				for (auto &itr : fd_ctxs_)
 					if (itr.socket_ > maxfd_)
 						maxfd_ = itr.socket_;
+			}
+				
 		}
 		void readable_callback(fd_context& fd_ctx)
 		{
@@ -673,12 +677,15 @@ namespace select
 				std::size_t len = io_ctx.to_recv_? 
 					io_ctx.to_recv_: io_ctx.buffer_.size();
 
-				auto bytes = ::recv(
-					io_ctx.socket_,
+				auto bytes = ::recv(io_ctx.socket_,
 					(char*)io_ctx.buffer_.data() + io_ctx.recv_bytes_,
 					(int)(len - io_ctx.recv_bytes_), 0);
-
-				if (bytes <= 0)
+#ifdef _MSC_VER
+				if (bytes == -1 && (WSAGetLastError() != WSAEWOULDBLOCK))
+#else
+				if (bytes == -1 && !(errno == EWOULDBLOCK ||
+					errno == EINTR))
+#endif // _MSC_VER
 				{
 					io_ctx.connection_->recv_callback(false);
 					return;
@@ -711,7 +718,12 @@ namespace select
 					static_cast<int>(io_ctx.to_send_ - io_ctx.send_bytes_),
 					0);
 
-				if (bytes <= 0)
+#ifdef _MSC_VER
+				if (bytes == -1 && (WSAGetLastError() != WSAEWOULDBLOCK))
+#else
+				if (bytes == -1 && !(errno == EAGAIN || errno == EWOULDBLOCK ||
+					errno == EINTR))
+#endif // _MSC_VER
 				{
 					io_ctx.connection_->send_callback(false);
 					return;
@@ -729,8 +741,12 @@ namespace select
 					(char*)io_ctx.buffer_.data() + io_ctx.send_bytes_,
 					static_cast<int>(io_ctx.to_send_ - io_ctx.send_bytes_), 
 					0);
-
-				if (bytes <= 0)
+#ifdef _MSC_VER
+				if(bytes == -1 && (WSAGetLastError() != WSAEWOULDBLOCK))
+#else
+				if (bytes == -1 && !(errno == EAGAIN || errno == EWOULDBLOCK ||
+					errno == EINTR))
+#endif // _MSC_VER
 				{
 					FD_CLR(io_ctx.socket_, &source_send_fds_);
 					FD_CLR(io_ctx.socket_, &source_recv_fds_);
@@ -738,7 +754,6 @@ namespace select
 					FD_CLR(io_ctx.socket_, &send_fds_);
 					FD_CLR(io_ctx.socket_, &recv_fds_);
 					FD_CLR(io_ctx.socket_, &except_fds_);
-					shutdown(io_ctx.socket_, SD_SEND);
 					socket_closer_(io_ctx.socket_);
 					fd_ctx.socket_ = INVALID_SOCKET;
 					retired = true;
@@ -753,7 +768,6 @@ namespace select
 					FD_CLR(io_ctx.socket_, &send_fds_);
 					FD_CLR(io_ctx.socket_, &recv_fds_);
 					FD_CLR(io_ctx.socket_, &except_fds_);
-					shutdown(io_ctx.socket_, SD_SEND);
 					socket_closer_(io_ctx.socket_);
 					fd_ctx.socket_ = INVALID_SOCKET;
 					retired = true;

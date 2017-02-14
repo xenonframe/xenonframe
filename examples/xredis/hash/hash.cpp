@@ -1,11 +1,7 @@
-#include "../include/hash.hpp"
+#include "xredis/hash.hpp"
+#include "xtest/xtest.hpp"
 
-
-template<typename ...T>
-int hello(const std::string &key, T && ...value, const std::string &str)
-{
-
-}
+XTEST_MAIN;
 
 XTEST_SUITE(hash)
 {
@@ -24,9 +20,8 @@ XTEST_SUITE(hash)
 				return;
 			}
 		});
-
-		
 	}
+	
 	void hset_test()
 	{
 		xredis::cmd::hash hash(redis);
@@ -64,20 +59,17 @@ XTEST_SUITE(hash)
 			}
 		});
 	}
-	XUNIT_TEST(set_addr)
+
+	XUNIT_TEST(do_test)
 	{
-		redis.set_addr("192.168.3.224",7000);
+		redis.set_addr("192.168.3.224", 7000);
 		redis.regist_cluster_init_callback([](std::string &&, bool result) {
 			if (!result)
 				xassert(false);
 			hset_test();
 			hget_test();
 		});
-	}
-	
-	
-	XUNIT_TEST(run)
-	{
+
 		pro.run();
 	}
 }

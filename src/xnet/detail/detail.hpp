@@ -17,13 +17,14 @@
 #include <atomic>
 #include <malloc.h>
 #include "timer.hpp"
-#define SELECT 1
+
 #if defined _MSC_VER
 #undef FD_SETSIZE
 #define FD_SETSIZE      1024
 #ifndef IOCP
 #define IOCP 1
 #endif
+
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
 #include <ws2tcpip.h>
