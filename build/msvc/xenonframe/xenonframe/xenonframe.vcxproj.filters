@@ -79,6 +79,9 @@
     <Filter Include="xwebsocket">
       <UniqueIdentifier>{ecf4cc18-7efb-469a-81e2-6556023ae947}</UniqueIdentifier>
     </Filter>
+    <Filter Include="xactor">
+      <UniqueIdentifier>{b07bb6b5-6553-45ee-989c-58cbc0564873}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\xnet\detail\functional.hpp">
@@ -431,6 +434,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\xwebsocket\make_handshake.hpp">
       <Filter>xwebsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xactor\xactor.hpp">
+      <Filter>xactor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

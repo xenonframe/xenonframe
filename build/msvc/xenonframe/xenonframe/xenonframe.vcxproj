@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\xactor\xactor.hpp" />
     <ClInclude Include="..\..\..\..\src\xasync\xasync.hpp" />
     <ClInclude Include="..\..\..\..\src\xcoroutine\xcoroutine.hpp" />
     <ClInclude Include="..\..\..\..\src\xhttper\http_builder.hpp" />

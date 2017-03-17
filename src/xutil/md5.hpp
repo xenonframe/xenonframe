@@ -305,7 +305,7 @@ namespace xutil
 		byte digest[16];
 
 		/* padding for calculate. */
-		static constexpr byte PADDING[64]{ 0x80 };
+		static constexpr byte PADDING[64] = { 0x80 };
 
 		/* Hex numbers. */
 		static constexpr char HEX_NUMBERS[16] =

@@ -29,3 +29,5 @@
 *.app
 x64
 *.VC.db
+
+Release
