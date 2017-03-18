@@ -684,13 +684,12 @@ namespace xjson
 					for (auto &itr : *val_->obj_)
 					{
 						str += "\"" + itr.first + "\"";
-						str += " : ";
+						str += ":";
 						str += itr.second.str();
-						str += ", ";
+						str += ",";
 					}
-					if (str.size() > 2)
+					if (str.size() > 1)
 					{
-						str.pop_back();
 						str.pop_back();
 					}
 					str += "}";
@@ -709,11 +708,10 @@ namespace xjson
 					for (auto &itr : *val_->vec_)
 					{
 						str += itr.str();
-						str += ", ";
+						str += ",";
 					}
-					if (str.size() > 2)
+					if (str.size() > 1)
 					{
-						str.pop_back();
 						str.pop_back();
 					}
 					str += "]";
