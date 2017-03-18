@@ -576,6 +576,8 @@ namespace xjson
 			get()
 		{
 			Container container;
+			if (val_->type_ == e_null) 
+				return container;
 			xjson_assert(val_->type_ == e_vec);
 			for (auto &itr : *val_->vec_)
 				container.emplace_back(itr.get<value_type>());
@@ -589,6 +591,8 @@ namespace xjson
 			get()
 		{
 			Container container;
+			if (val_->type_ == e_null)
+				return container;
 			xjson_assert(val_->type_ == e_obj);
 			for (auto &itr : *val_->obj_)
 				container.emplace(itr.first, itr.second.get<mapped_type>());
