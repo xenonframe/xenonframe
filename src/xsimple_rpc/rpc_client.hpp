@@ -76,7 +76,7 @@ namespace xsimple_rpc
 			auto resp = result.first(rpc_timeout_);
 			uint8_t *ptr = (uint8_t*)resp.data();
 			uint8_t *end = ptr + resp.size();
-			auto res = detail::endec::get<Ret>(ptr, end);
+			auto res = xutil::endec::get<Ret>(ptr, end);
 			if (ptr != end)
 				throw std::runtime_error("rpc resp error");
 			return std::move(res);
@@ -99,7 +99,7 @@ namespace xsimple_rpc
 			auto resp = result.first(rpc_timeout_);
 			uint8_t *ptr = (uint8_t*)resp.data();
 			uint8_t *end = ptr + resp.size();
-			auto res = detail::endec::get<Ret>(ptr, end);
+			auto res = xutil::endec::get<Ret>(ptr, end);
 			if (ptr != end)
 				throw std::runtime_error("rpc resp error");
 			return std::move(res);

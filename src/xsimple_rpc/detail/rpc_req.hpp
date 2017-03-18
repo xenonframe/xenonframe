@@ -29,10 +29,10 @@ namespace xsimple_rpc
 		inline std::size_t min_rpc_msg_len()
 		{
 			static std::size_t min_rpc_len_ = 
-			endec::get_sizeof(uint64_t()) +
-				endec::get_sizeof(std::string()) +
-				endec::get_sizeof(magic_code) +
-				endec::get_sizeof(uint32_t());
+			xutil::endec::get_sizeof(uint64_t()) +
+				xutil::endec::get_sizeof(std::string()) +
+				xutil::endec::get_sizeof(magic_code) +
+				xutil::endec::get_sizeof(uint32_t());
 			return min_rpc_len_;
 		}
 		template<typename ...Args>
@@ -41,19 +41,19 @@ namespace xsimple_rpc
 			using namespace detail;
 			std::string buffer;
 			uint32_t buffer_size = uint32_t(
-				endec::get_sizeof(req_id) +
-				endec::get_sizeof(tp) +
-				endec::get_sizeof(rpc_name) +
-				endec::get_sizeof(magic_code) +
-				endec::get_sizeof(uint32_t()));
+				xutil::endec::get_sizeof(req_id) +
+				xutil::endec::get_sizeof(tp) +
+				xutil::endec::get_sizeof(rpc_name) +
+				xutil::endec::get_sizeof(magic_code) +
+				xutil::endec::get_sizeof(uint32_t()));
 
 			buffer.resize(buffer_size);
 			uint8_t*ptr = (uint8_t*)buffer.data();
-			endec::put(ptr, buffer_size);
-			endec::put(ptr, magic_code);
-			endec::put(ptr, req_id);
-			endec::put(ptr, rpc_name);
-			endec::put(ptr, tp);
+			xutil::endec::put(ptr, buffer_size);
+			xutil::endec::put(ptr, magic_code);
+			xutil::endec::put(ptr, req_id);
+			xutil::endec::put(ptr, rpc_name);
+			xutil::endec::put(ptr, tp);
 			return std::move(buffer);
 		}
 		inline std::string make_req(const std::string &rpc_name, int64_t req_id)
@@ -61,17 +61,17 @@ namespace xsimple_rpc
 			using namespace detail;
 			std::string buffer;
 			uint32_t buffer_size = uint32_t(
-				endec::get_sizeof(req_id) +
-				endec::get_sizeof(rpc_name) +
-				endec::get_sizeof(magic_code) +
-				endec::get_sizeof(uint32_t()));
+				xutil::endec::get_sizeof(req_id) +
+				xutil::endec::get_sizeof(rpc_name) +
+				xutil::endec::get_sizeof(magic_code) +
+				xutil::endec::get_sizeof(uint32_t()));
 
 			buffer.resize(buffer_size);
 			uint8_t*ptr = (uint8_t*)buffer.data();
-			endec::put(ptr, buffer_size);
-			endec::put(ptr, magic_code);
-			endec::put(ptr, req_id);
-			endec::put(ptr, rpc_name);
+			xutil::endec::put(ptr, buffer_size);
+			xutil::endec::put(ptr, magic_code);
+			xutil::endec::put(ptr, req_id);
+			xutil::endec::put(ptr, rpc_name);
 			return std::move(buffer);
 		}
 
@@ -81,17 +81,17 @@ namespace xsimple_rpc
 			using namespace detail;
 			std::string buffer;
 			uint32_t buffer_size = uint32_t(
-				endec::get_sizeof(req_id) +
-				endec::get_sizeof(data) +
-				endec::get_sizeof(magic_code) +
-				endec::get_sizeof(uint32_t()));
+				xutil::endec::get_sizeof(req_id) +
+				xutil::endec::get_sizeof(data) +
+				xutil::endec::get_sizeof(magic_code) +
+				xutil::endec::get_sizeof(uint32_t()));
 
 			buffer.resize(buffer_size);
 			uint8_t*ptr = (uint8_t*)buffer.data();
-			endec::put(ptr, buffer_size);
-			endec::put(ptr, magic_code);
-			endec::put(ptr, req_id);
-			endec::put(ptr, std::move(data));
+			xutil::endec::put(ptr, buffer_size);
+			xutil::endec::put(ptr, magic_code);
+			xutil::endec::put(ptr, req_id);
+			xutil::endec::put(ptr, std::move(data));
 			return std::move(buffer);
 		}
 	}

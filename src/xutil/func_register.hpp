@@ -1,5 +1,6 @@
 #pragma once
-namespace xsimple_rpc
+#include "endec.hpp"
+namespace xutil
 {
 	struct lock_free 
 	{
@@ -59,8 +60,7 @@ namespace xsimple_rpc
 		typename std::enable_if<sizeof...(Args) == 1, void>::type
 			regist_help(const std::string &funcname, std::function<void(Args...)> &&func)
 		{
-			std::function<std::string(Args...)> wrapper_func(
-				[func](Args&&... args)->std::string {
+			std::function<std::string(Args...)> wrapper_func([func](Args&&... args)->std::string {
 				func(std::forward<Args>(args)...);
 				return{};
 			});
@@ -83,11 +83,11 @@ namespace xsimple_rpc
 			auto func_impl = [func](uint8_t*, uint8_t *const) ->std::string
 			{
 				func();
-				static std::string ret;
+				std::string ret;
 				std::string buffer;
-				buffer.resize(detail::endec::get_sizeof(ret));
+				buffer.resize(endec::get_sizeof(ret));
 				auto ptr = (uint8_t *)(buffer.data());
-				detail::endec::put(ptr, ret);
+				endec::put(ptr, ret);
 				return {};
 			};
 			std::lock_guard<mutex> locker(mtex_);
@@ -100,9 +100,9 @@ namespace xsimple_rpc
 			{
 				auto result = func();
 				std::string buffer;
-				buffer.resize(detail::endec::get_sizeof(result));
+				buffer.resize(endec::get_sizeof(result));
 				auto ptr = (uint8_t *)(buffer.data());
-				detail::endec::put(ptr, result);
+				endec::put(ptr, result);
 				return std::move(buffer);
 			};
 			std::lock_guard<mutex> locker(mtex_);
@@ -115,12 +115,12 @@ namespace xsimple_rpc
 		{
 			auto func_impl = [func](uint8_t *&ptr, uint8_t *const end) ->std::string
 			{
-				auto tp= detail::endec::get<typename std::remove_const<typename std::remove_reference<Args>::type>::type...>(ptr, end);
+				auto tp= endec::get<typename std::remove_const<typename std::remove_reference<Args>::type>::type...>(ptr, end);
 				Ret result = func(std::get<Indexes>(tp)...);
 				std::string buffer;
-				buffer.resize(detail::endec::get_sizeof(result));
+				buffer.resize(endec::get_sizeof(result));
 				auto buffer_ptr = (uint8_t *)(buffer.data());
-				detail::endec::put(buffer_ptr, result);
+				endec::put(buffer_ptr, result);
 				return std::move(buffer);
 			};
 			std::lock_guard<mutex> locker(mtex_);
@@ -132,11 +132,11 @@ namespace xsimple_rpc
 			auto func_impl = [func](uint8_t *&ptr, uint8_t *const end) ->std::string
 			{
 				using type = typename std::remove_const<typename std::remove_reference<Arg>::type>::type;
-				Ret result = func(detail::endec::get<type>(ptr, end));
+				Ret result = func(endec::get<type>(ptr, end));
 				std::string buffer;
-				buffer.resize(detail::endec::get_sizeof(result));
+				buffer.resize(endec::get_sizeof(result));
 				auto buffer_ptr = (uint8_t *)(buffer.data());
-				detail::endec::put(buffer_ptr, result);
+				endec::put(buffer_ptr, result);
 				return std::move(buffer);
 				return{};
 			};

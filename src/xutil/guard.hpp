@@ -9,6 +9,10 @@ namespace xutil
 		{
 			
 		}
+		void release()
+		{
+			func_ = nullptr;
+		}
 		~guard()
 		{
 			if(func_)

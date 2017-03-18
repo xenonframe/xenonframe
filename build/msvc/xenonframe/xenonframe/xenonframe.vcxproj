@@ -89,9 +89,6 @@
     <ClInclude Include="..\..\..\..\src\xredis\xredis.hpp" />
     <ClInclude Include="..\..\..\..\src\xsimple_rpc\async_client.hpp" />
     <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\detail.hpp" />
-    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\endec.hpp" />
-    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\func_register.hpp" />
-    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\gen_endec.hpp" />
     <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\rpc_req.hpp" />
     <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\rpc_session.hpp" />
     <ClInclude Include="..\..\..\..\src\xsimple_rpc\rpc_client.hpp" />
@@ -115,9 +112,12 @@
     <ClInclude Include="..\..\..\..\src\xutil\detail\vfs_impl.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\detail\win_file_stream.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\detail\win_vfs.hpp" />
+    <ClInclude Include="..\..\..\..\src\xutil\endec.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\file_stream.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\functional.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\function_traits.hpp" />
+    <ClInclude Include="..\..\..\..\src\xutil\func_register.hpp" />
+    <ClInclude Include="..\..\..\..\src\xutil\gen_endec.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\guard.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\has_member_traits.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\make_index_sequence.hpp" />

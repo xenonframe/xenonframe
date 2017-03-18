@@ -288,15 +288,6 @@
     <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\detail.hpp">
       <Filter>xsimple_rpc\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\endec.hpp">
-      <Filter>xsimple_rpc\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\func_register.hpp">
-      <Filter>xsimple_rpc\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\gen_endec.hpp">
-      <Filter>xsimple_rpc\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\xsimple_rpc\detail\rpc_req.hpp">
       <Filter>xsimple_rpc\detail</Filter>
     </ClInclude>
@@ -437,6 +428,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\xactor\xactor.hpp">
       <Filter>xactor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\endec.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\func_register.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\gen_endec.hpp">
+      <Filter>xutil</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

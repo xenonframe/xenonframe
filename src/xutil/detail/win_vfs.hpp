@@ -95,12 +95,14 @@ namespace xutil
 						pos = path.find_first_of('/', offset);
 					if (pos == std::string::npos)
 					{
-						return !!CreateDirectory(path.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
+						return !!CreateDirectory(path.c_str(), NULL) || 
+							ERROR_ALREADY_EXISTS == GetLastError();
 					}
 					else {
 						auto parent_dir = path.substr(0, pos);
 						offset = pos + 1;
-						if (!!CreateDirectory(parent_dir.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError())
+						if (!!CreateDirectory(parent_dir.c_str(), NULL) ||
+							ERROR_ALREADY_EXISTS == GetLastError())
 							continue;
 						return false;
 					}
@@ -361,7 +363,8 @@ namespace xutil
 				{
 					return false;
 				}
-				if ((dwAttr & (FILE_ATTRIBUTE_ARCHIVE | FILE_ATTRIBUTE_NORMAL)) == 0)
+				if ((dwAttr & (FILE_ATTRIBUTE_ARCHIVE | 
+					FILE_ATTRIBUTE_NORMAL)) == 0)
 				{
 					return false;
 				}
@@ -487,7 +490,10 @@ namespace xutil
 			std::string operator ()(const std::string &name)
 			{
 				char buffer[1024];
-				DWORD n = GetEnvironmentVariable(name.c_str(), buffer, sizeof(buffer));
+				DWORD n = GetEnvironmentVariable(
+					name.c_str(), 
+					buffer, 
+					sizeof(buffer));
 				if (!n)
 					return {};
 				return std::string(buffer, n);
@@ -498,7 +504,9 @@ namespace xutil
 		{
 			bool operator()(const std::string &name, const std::string &value)
 			{
-				return !!SetEnvironmentVariable(name.c_str(), value.c_str());
+				return !!SetEnvironmentVariable(
+					name.c_str(), 
+					value.c_str());
 			}
 		};
 	}

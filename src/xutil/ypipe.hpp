@@ -3,7 +3,7 @@
 #include "yqueue.hpp"
 namespace xutil
 {
-	template <typename T, int N> class ypipe
+	template <typename T, int N=128> class ypipe
 	{
 	public:
 		inline ypipe()

@@ -119,7 +119,7 @@ namespace xsimple_rpc
 					step = e_msg_data;
 					uint8_t *ptr = (uint8_t*)data;
 					uint8_t *end = (uint8_t*)data + len;
-					_conn.async_recv(detail::endec::get<uint32_t>(ptr, end) - sizeof(uint32_t));
+					_conn.async_recv(xutil::endec::get<uint32_t>(ptr, end) - sizeof(uint32_t));
 					return;
 				}else if (step == e_msg_data)
 				{
@@ -140,10 +140,10 @@ namespace xsimple_rpc
 			uint8_t *end = (uint8_t*)data + len;
 			try
 			{
-				if (detail::endec::get<std::string>(ptr, end) != magic_code)
+				if (xutil::endec::get<std::string>(ptr, end) != magic_code)
 					return false;
-				uint64_t req_id = detail::endec::get<uint64_t>(ptr, end);
-				std::string req_name = detail::endec::get<std::string>(ptr, end);
+				uint64_t req_id = xutil::endec::get<uint64_t>(ptr, end);
+				std::string req_name = xutil::endec::get<std::string>(ptr, end);
 				session.in_callback_ = true;
 				session.do_send_resp(detail::make_resp(req_id, func_register_.invoke(req_name, ptr, end)));
 				session.in_callback_ = false;
@@ -155,7 +155,7 @@ namespace xsimple_rpc
 			}
 			return !session.is_close_;
 		}
-		func_register<std::mutex> func_register_;
+		xutil::func_register<std::mutex> func_register_;
 		std::mutex conns_mutex_;
 		std::list<rpc_session> conns_;
 		rpc_proactor_pool &rpc_proactor_pool_;

@@ -180,7 +180,7 @@ namespace xsimple_rpc
 		int64_t session_id_ = 1;
 		std::map<int64_t, std::shared_ptr<rpc_session>> rpc_sessions_;
 
-		std::atomic<uint64_t> msgboxs_index_ { 0 };
+		std::atomic<std::size_t> msgboxs_index_ { 0 };
 
 		std::mutex connectors_mutex_;
 		int64_t connector_index_ = 0;

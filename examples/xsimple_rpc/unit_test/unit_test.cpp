@@ -69,21 +69,21 @@ XTEST_SUITE(endnc)
 	{
 		std::map<std::string, MyStruct> map;
 		std::string buffer;
-		buffer.resize(endec::get_sizeof(map));
+		buffer.resize(xutil::endec::get_sizeof(map));
 		uint8_t *ptr = (uint8_t *)buffer.data();
-		endec::put(ptr, map);
+		xutil::endec::put(ptr, map);
 	}
 
 	XUNIT_TEST(map_get)
 	{
 		std::map<std::string, MyStruct> map;
 		std::string buffer;
-		buffer.resize(endec::get_sizeof(map));
+		buffer.resize(xutil::endec::get_sizeof(map));
 		uint8_t *ptr = (uint8_t *)buffer.data();
-		endec::put(ptr, map);
+		xutil::endec::put(ptr, map);
 
 		ptr = (uint8_t *)buffer.data();
-		auto res = endec::get<decltype(map)>(ptr, ptr + buffer.size());
+		auto res = xutil::endec::get<decltype(map)>(ptr, ptr + buffer.size());
 	}
 
 	XUNIT_TEST(set_put)
@@ -91,9 +91,9 @@ XTEST_SUITE(endnc)
 		std::set<std::string> set;
 
 		std::string buffer;
-		buffer.resize(endec::get_sizeof(set));
+		buffer.resize(xutil::endec::get_sizeof(set));
 		uint8_t *ptr = (uint8_t *)buffer.data();
-		endec::put(ptr, set);
+		xutil::endec::put(ptr, set);
 	}
 
 	XUNIT_TEST(set_get)
@@ -101,12 +101,12 @@ XTEST_SUITE(endnc)
 		std::set<std::string> obj;
 
 		std::string buffer;
-		buffer.resize(endec::get_sizeof(obj));
+		buffer.resize(xutil::endec::get_sizeof(obj));
 		uint8_t *ptr = (uint8_t *)buffer.data();
-		endec::put(ptr, obj);
+		xutil::endec::put(ptr, obj);
 
 		ptr = (uint8_t *)buffer.data();
-		auto res = endec::get<decltype(obj)>(ptr, ptr+ buffer.size());
+		auto res = xutil::endec::get<decltype(obj)>(ptr, ptr+ buffer.size());
 	}
 
 	XUNIT_TEST(list_put)
@@ -114,9 +114,9 @@ XTEST_SUITE(endnc)
 		std::list<std::string> obj;
 
 		std::string buffer;
-		buffer.resize(endec::get_sizeof(obj));
+		buffer.resize(xutil::endec::get_sizeof(obj));
 		uint8_t *ptr = (uint8_t *)buffer.data();
-		endec::put(ptr, obj);
+		xutil::endec::put(ptr, obj);
 	}
 
 	XUNIT_TEST(list_get)
@@ -124,12 +124,12 @@ XTEST_SUITE(endnc)
 		std::list<std::string> obj;
 
 		std::string buffer;
-		buffer.resize(endec::get_sizeof(obj));
+		buffer.resize(xutil::endec::get_sizeof(obj));
 		uint8_t *ptr = (uint8_t *)buffer.data();
-		endec::put(ptr, obj);
+		xutil::endec::put(ptr, obj);
 
 		ptr = (uint8_t *)buffer.data();
-		auto res = endec::get<decltype(obj)>(ptr, ptr + buffer.size());
+		auto res = xutil::endec::get<decltype(obj)>(ptr, ptr + buffer.size());
 	}
 
 	XUNIT_TEST(pair_put)
@@ -137,9 +137,9 @@ XTEST_SUITE(endnc)
 		std::pair<std::string, std::string> obj;
 
 		std::string buffer;
-		buffer.resize(endec::get_sizeof(obj));
+		buffer.resize(xutil::endec::get_sizeof(obj));
 		uint8_t *ptr = (uint8_t *)buffer.data();
-		endec::put(ptr, obj);
+		xutil::endec::put(ptr, obj);
 	}
 
 	XUNIT_TEST(pair_get)
@@ -147,12 +147,12 @@ XTEST_SUITE(endnc)
 		std::pair<std::string, std::string> obj;
 
 		std::string buffer;
-		buffer.resize(endec::get_sizeof(obj));
+		buffer.resize(xutil::endec::get_sizeof(obj));
 		uint8_t *ptr = (uint8_t *)buffer.data();
-		endec::put(ptr, obj);
+		xutil::endec::put(ptr, obj);
 
 		ptr = (uint8_t *)buffer.data();
-		auto res = endec::get<decltype(obj)>(ptr, ptr + buffer.size());
+		auto res = xutil::endec::get<decltype(obj)>(ptr, ptr + buffer.size());
 	}
 }
 XTEST_SUITE(rpc_server)

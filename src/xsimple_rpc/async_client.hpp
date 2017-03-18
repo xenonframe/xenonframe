@@ -74,7 +74,7 @@ namespace xsimple_rpc
 			callbacks_.emplace_back(id, [this, callback](const std::string &error_code, const std::string &resp) {
 				uint8_t *ptr = (uint8_t *)resp.data();
 				uint8_t *end = (uint8_t *)resp.data() + resp.size();
-				callback(error_code, endec::get<Ret>(ptr, end));
+				callback(error_code, xutil::endec::get<Ret>(ptr, end));
 			});
 			if (is_send_)
 			{
@@ -88,7 +88,7 @@ namespace xsimple_rpc
 		template<typename Ret, typename ...Args>
 		void rpc_call_help(xutil::function_traits<Ret(Args...)>,
 			const std::string &rpc_name, 
-			std::tuple<typename endec::remove_const_ref<Args>::type&&...> &&_tuple, 
+			std::tuple<typename xutil::endec::remove_const_ref<Args>::type&&...> &&_tuple, 
 			std::function<void(const std::string &, typename std::remove_reference<Ret>::type)>&&callback)
 		{
 			using detail::make_req;
@@ -97,7 +97,7 @@ namespace xsimple_rpc
 			callbacks_.emplace_back(id, [this, callback](const std::string &error_code, std::string &resp) {
 				uint8_t *ptr = (uint8_t *)resp.data();
 				uint8_t *end = (uint8_t *)resp.data() + resp.size();
-				callback(error_code, endec::get<Ret>(ptr, end));
+				callback(error_code, xutil::endec::get<Ret>(ptr, end));
 			});
 			if (is_send_)
 			{
@@ -128,7 +128,7 @@ namespace xsimple_rpc
 					step_ = e_msg_data;
 					uint8_t *ptr = (uint8_t*)data;
 					uint8_t *end = (uint8_t*)data + len;
-					uint32_t msg_len = endec::get<uint32_t>(ptr, end);
+					uint32_t msg_len = xutil::endec::get<uint32_t>(ptr, end);
 					if (msg_len < min_rpc_msg_len())
 						goto _close;
 					conn_.async_recv(msg_len - sizeof(uint32_t));
@@ -141,10 +141,10 @@ namespace xsimple_rpc
 					uint8_t *end = (uint8_t*)data + len;
 					try
 					{
-						if (endec::get<std::string>(ptr, end) != magic_code)
+						if (xutil::endec::get<std::string>(ptr, end) != magic_code)
 							goto _close;
-						auto req_id = endec::get<int64_t>(ptr, end);
-						auto resp = endec::get<std::string>(ptr, end);
+						auto req_id = xutil::endec::get<int64_t>(ptr, end);
+						auto resp = xutil::endec::get<std::string>(ptr, end);
 						if (callbacks_.empty() || callbacks_.front().first != req_id)
 							goto _close;
 						callbacks_.front().second({}, resp);

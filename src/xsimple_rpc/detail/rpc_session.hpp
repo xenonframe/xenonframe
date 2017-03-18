@@ -51,7 +51,7 @@ namespace xsimple_rpc
 				uint8_t *end = reinterpret_cast<uint8_t*>(data) + len;
 				if (msg_len_ == 0 && len == sizeof(msg_len_))
 				{
-					msg_len_ = endec::get<uint32_t>(ptr, end);
+					msg_len_ = xutil::endec::get<uint32_t>(ptr, end);
 					if (msg_len_ < min_rpc_msg_len())
 					{
 						std::cout << "msg len invalid" << std::endl;
@@ -63,20 +63,20 @@ namespace xsimple_rpc
 				}
 				try
 				{
-					if(magic_code != endec::get<std::string>(ptr, end))
+					if(magic_code != xutil::endec::get<std::string>(ptr, end))
 						return false;
 
 					auto item = wait_rpc_resp_list_.front();
 					wait_rpc_resp_list_.pop_front();
 
-					auto req_id = endec::get<int64_t>(ptr, end);
+					auto req_id = xutil::endec::get<int64_t>(ptr, end);
 					if (item->req_id_ != req_id)
 					{
 						std::cout << "req_id != item->req_id_" << std::endl;
 						return false;
 					}
 					std::unique_lock<std::mutex> locker(mtx_);
-					item->result_ = endec::get<std::string>(ptr, end);
+					item->result_ = xutil::endec::get<std::string>(ptr, end);
 					item->status_ = rpc_req::status::e_ok;
 					cv_.notify_one();
 
@@ -115,7 +115,7 @@ namespace xsimple_rpc
 			std::mutex mtx_;
 			std::condition_variable cv_;
 			xnet::connection conn_;
-			int64_t msgbox_index_ = 0;
+			std::size_t msgbox_index_ = 0;
 			std::function<void()> close_callback_;
 			std::list<std::shared_ptr<rpc_req>> req_item_list_;
 			std::list<std::shared_ptr<rpc_req>> wait_rpc_resp_list_;
