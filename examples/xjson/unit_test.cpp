@@ -129,6 +129,12 @@ XTEST_SUITE(xjson)
 		no_exist = o["no_exist"].get<decltype(a)>();
 		xassert((!no_exist));
 
+		optional<user> u = o.get<optional<user>>();
+		if (u)
+		{
+			user u1 = u.get();
+		}
+
 	}
 	XUNIT_TEST(initializer_list)
 	{
@@ -139,8 +145,8 @@ XTEST_SUITE(xjson)
 		{
 			xassert(o["ints"].get<int>(i - 1) == i);
 		}
-		obj_t::map_t m = { {"1", 1 },{"2", "2"},{"true", true} } ;
-		obj_t o2 = m;
+		obj_t o2 = obj_t::map_t{ { "1", 1 },{ "2", "2" },{ "true", true } };
+
 		xassert(o2["1"].get<int>() == 1);
 		xassert(o2["2"].get<std::string>() == "2");
 		xassert(o2["true"].get<bool>() == true);
