@@ -28,7 +28,7 @@ XTEST_SUITE(xhttper)
 		xhttper::http_parser per;
 
 		auto size = strlen(buf);
-		for (int i =0 ; i < size; i++)
+		for (std::size_t i =0 ; i < size; i++)
 		{
 			per.append(buf + i, 1);
 			if (per.parse_req())
@@ -113,7 +113,7 @@ XTEST_SUITE(xhttper)
 			"Cache-control: private\r\n\r\n";
 
 		xhttper::http_parser per;
-		int length = (int)strlen(buf);
+		size_t length = strlen(buf);
 		for (size_t i = 0; i < length; i++)
 		{
 			per.append(buf + i, 1);

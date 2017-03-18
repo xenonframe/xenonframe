@@ -148,10 +148,10 @@ namespace xjson
 		{
 			return val_;
 		}
-		void operator=(const T &val)
+		void operator=(T &&val)
 		{
 			valid_ = true;
-			val_ = val;
+			val_ = std::forward<T>(val);
 		}
 		optional &operator = (optional <T> &&val)
 		{
