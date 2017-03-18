@@ -28,7 +28,6 @@ XTEST_SUITE(xjson)
 		XGSON(id, name, ints, int_map_, oos);
 	};
 
-
 	XUNIT_TEST(XGSON)
 	{
 		user u{ 1,"u1" };
@@ -36,6 +35,14 @@ XTEST_SUITE(xjson)
 		obj_t o;
 		o = u;
 		auto u0 =  o.get<user>();
+
+		auto str = o.str();
+
+		auto o1 = xjson::build(str);
+		auto u1 = o1.get<user>();
+
+		xassert(u0.id == u1.id);
+		xassert(u0.name == u1.name);
 
 		std::cout << o.str() << std::endl;
 
