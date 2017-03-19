@@ -19,7 +19,7 @@ namespace xutil
 			cv_.notify_one();
 		}
 
-		bool pop(T &t, int timeout_mills = 0)
+		bool pop(T &job, int timeout_mills = 0)
 		{
 			std::unique_lock<std::mutex> locker(mtex_);
 			if (queue_.empty())
@@ -36,7 +36,7 @@ namespace xutil
 						return false;
 				}
 			}
-			t = std::move(queue_.front());
+			job = std::move(queue_.front());
 			queue_.pop();
 			return true;
 		}

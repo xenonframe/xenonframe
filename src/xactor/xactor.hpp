@@ -11,64 +11,160 @@
 
 namespace xactor
 {
-	
-
-
-	using engine_id = int64_t;
+	using engine_id = uint64_t;
 
 	struct address
 	{
-		engine_id engine_id_;
-		int64_t actor_id_;
-		XENDEC(engine_id_, actor_id_);
-	};
-	struct address_less 
-	{
-		bool operator()(const address &lhs, const address &rhs) const
+		engine_id engine_id_ = 0;
+		uint64_t actor_id_ = 0;
+
+		struct address_less
 		{
-			if (lhs.engine_id_ < rhs.engine_id_)
-				return true;
-			else if (lhs.actor_id_ < rhs.actor_id_)
-				return true;
-			return false;
-		}
+			bool operator()(
+				const address &lhs,
+				const address &rhs) const
+			{
+				return (lhs.engine_id_ < rhs.engine_id_ ||
+					lhs.actor_id_ < rhs.actor_id_);
+			}
+		};
+		XENDEC(engine_id_, actor_id_);
 	};
 
 	/*
-	| magic_code| msg length| source addr| destination addr | msg type | msg |
+	| magic_code| msg length| from | to | msg type | msg |
 	*/
+
+#define RegistActorMsg(MsgName,...) \
+	static constexpr char *_$_actor_msg_type_ = \
+	"User::"#MsgName; \
+	XENDEC(__VA_ARGS__);
+
+#define RegistSysMsg(MsgName,...) \
+	static constexpr char * _$_actor_msg_type_ = \
+	"Sys::"#MsgName; \
+	XENDEC(__VA_ARGS__);
+
 
 	struct msg
 	{
-		address source_;
-		address dest_;
-		std::string type_;
+		address from_;
+		address to_;
+		std::string name_;
 		std::string data_;
-		XENDEC(source_, dest_, type_, data_);
+		XENDEC(from_, to_, name_, data_);
 	};
+	static constexpr int magic_code = 1213141516;
 
+	struct msg_header
+	{
+		int magic_code = 1213141516;
+		int length_ = 0;
+
+		XENDEC(magic_code, length_);
+	};
 
 	template<typename T>
 	inline constexpr char *get_msg_name()
 	{
-		return T::name;
+		return std::decay<T>::type::_$_actor_msg_type_;
+	}
+
+	template<typename T>
+	inline constexpr char *get_msg_name(T*)
+	{
+		return std::decay<T>::type::_$_actor_msg_type_;
 	}
 
 
 	template<typename T>
 	inline T to_msg(const std::string &data)
 	{
-		return T();
+		uint8_t *ptr = (uint8_t *)data.data();
+		uint8_t *end = ptr + data.length();
+		return xutil::endec::get<T>(ptr, end);
 	}
 
-	
+	template<typename T>
+	inline T to_msg(char *data, std::size_t len)
+	{
+		auto ptr = (uint8_t *)data;
+		auto end = ptr + len;
+		return xutil::endec::get<T>(ptr, end);
+	}
+
+	template<typename T>
+	inline std::string to_data(const T &m)
+	{
+		std::string buffer;
+		buffer.resize(m.xget_sizeof());
+		uint8_t *ptr = (uint8_t*)buffer.data();
+		uint8_t *end = ptr + buffer.size();
+		xutil::endec::put(ptr, m);
+		return buffer;
+	}
+
+
+	namespace notify 
+	{
+		struct address_error
+		{
+			address address_;
+			RegistActorMsg(address_error, address_);
+		};
+
+		struct actor_close
+		{
+			address address_;
+			RegistActorMsg(actor_close, address_);
+		};
+
+		struct actor_join
+		{
+			address address_;
+			RegistActorMsg(actor_join, address_);
+		};
+	};
+
+	namespace sys
+	{
+		struct init
+		{
+			bool _;
+			RegistSysMsg(init, _);
+		};
+
+		struct watch 
+		{
+			bool _;
+			RegistSysMsg(watch, _);
+		};
+
+		struct set_timer 
+		{
+			int32_t millis_;
+			uint32_t timer_id_;
+			RegistSysMsg(set_timer, millis_, timer_id_);
+		};
+
+		struct cancel_timer
+		{
+			uint32_t timer_id_;
+			RegistSysMsg(cancel_timer, timer_id_);
+		};
+
+		struct timer_expire
+		{
+			uint32_t timer_id_;
+			RegistSysMsg(timer_expire, timer_id_);
+		};
+	}
 
 	class actor
 	{
 	public:
 		using ptr_t = std::shared_ptr<actor>;
 		using wptr_t = std::weak_ptr<actor>;
-
 		actor()
 		{
 
@@ -77,21 +173,72 @@ namespace xactor
 		{
 
 		}
+		address get_address()
+		{
+			return addr_;
+		}
 	protected:
+		virtual void init()
+		{
+			std::cout << "actor init" << std::endl;
+		}
+
 		template<typename T>
-		void regist_msg(const std::function<void(T &&)>& func)
+		void regist(const std::function<void(const address &from, T &&)>& func)
 		{
 			auto type = get_msg_name<T>();
 			auto itr = msg_handles_.find(type);
 			if (itr != msg_handles_.end())
-				throw std::logic_error(type + " repeated regist");
-			msg_handles_.emplace(type, [func](const std::string &datat){
-				func(to_msg());
+				throw std::logic_error(type + std::string(" repeated regist"));
+			msg_handles_.emplace(type, [func](const msg &m){
+				func(m.from_, to_msg<T>(m.data_));
 			});
 		}
-		void regist_timer(const std::function<void()> &func, int64_t millis)
-		{
 
+		uint32_t set_timer(int32_t millis, const std::function<void()> &func)
+		{
+			timer_handle_.emplace(timer_index_, func);
+
+			sys::set_timer set_time_;
+			set_time_.millis_ = millis;
+			set_time_.timer_id_ = timer_index_;
+
+			send({}, set_time_);
+			return timer_index_++;
+		}
+
+		void cancel_timer(uint32_t timer_id_)
+		{
+			auto itr = timer_handle_.find(timer_id_);
+			if (itr != timer_handle_.end())
+			{
+				timer_handle_.erase(itr);
+				send({}, sys::cancel_timer{ timer_id_ });
+			}
+		}
+		
+
+		void watch(const address &addr)
+		{
+			send(addr, sys::watch());
+		}
+
+		void close()
+		{
+			for (auto &itr : observers_)
+				send(itr, notify::actor_close{ itr });
+			close_(addr_);
+		}
+
+		template<typename T>
+		void send(const address &to, T &&_msg)
+		{
+			msg m;
+			m.data_ = to_data(_msg);
+			m.from_ = addr_;
+			m.to_ = to;
+			m.name_ = get_msg_name<T>();
+			send_msg_(std::move(m));
 		}
 	private:
 		friend class xengine;
@@ -100,35 +247,56 @@ namespace xactor
 			msg_queue_.write(std::move(m));
 			return msg_queue_.flush();
 		}
-		bool apply_all()
+
+		void apply_all()
 		{
 			while (apply_once());
 		}
+
 		bool apply_once()
 		{
 			auto m = msg_queue_.read();
 			if (!m.first)
 				return false;
 			apply(m.second);
+			return msg_queue_.check_read();
 		}
+
 		void apply(const msg &m)
 		{
-			auto itr = msg_handles_.find(m.type_);
-			if (itr == msg_handles_.end())
-				throw std::logic_error("can't find " + m.type_+ " msg handle");
-			try
+			auto itr = msg_handles_.find(m.name_);
+			if (itr != msg_handles_.end())
 			{
-				itr->second(m.data_);
+				try
+				{
+					itr->second(m);
+				}
+				catch (const std::exception& e)
+				{
+					std::cout << e.what() << std::endl;
+				}
 			}
-			catch (const std::exception& e)
+			else if (m.name_ == get_msg_name<sys::watch>())
 			{
-				std::cout << e.what() << std::endl;
+				observers_.insert(m.from_);
+			}
+			else if(m.name_ == get_msg_name<sys::init>())
+			{
+				init();
 			}
 		}
-		using msg_handle_t = std::function<void(const std::string &)>;
+		using msg_handle_t = std::function<void(const msg &)>;
 		std::map<std::string, msg_handle_t> msg_handles_;
-		address address_;
+		address addr_;
 		xutil::ypipe<msg> msg_queue_;
+
+		std::function<void(msg &&)> send_msg_;
+		std::function<void(address )> close_;
+
+		std::set<address, address::address_less> observers_;
+		std::map<uint32_t, std::function<void()>> timer_handle_;
+
+		uint32_t timer_index_ = 1;
 	};
 
 	class session 
@@ -136,11 +304,25 @@ namespace xactor
 	{
 	public:
 		using msgbox_t = xnet::proactor_pool::msgbox_t;
+
+		struct session_id
+		{
+			struct session_id_less
+			{
+				bool operator()(const session_id&left, const session_id& right)const
+				{
+					return (left.peer_ < right.peer_ || left.self_ < right.self_);
+				}
+			};
+			engine_id peer_;
+			engine_id self_;
+		};
+
 		session(xnet::connection &&conn, msgbox_t &msgbox_)
 			:msgbox_(msgbox_),
 			conn_(std::move(conn))
 		{
-
+			init();
 		}
 		void send_msg(std::string &&msg)
 		{
@@ -150,21 +332,50 @@ namespace xactor
 				return;
 			regist_send();
 		}
-	private:
-		struct header
+
+		void send_msg(const msg& m)
 		{
-			int magic_num = 13141516;
-			int length_ = 0;
-		};
+			using xutil::endec::put;
+
+			std::string buffer;
+			std::size_t len(0);
+
+			len += sizeof(int);//magic code
+			len += sizeof(int);//msg length
+			len += m.xget_sizeof();
+			buffer.resize(len);
+
+			len -= 2 * sizeof(int);
+			uint8_t *ptr = (uint8_t *)buffer.data();
+
+			put(ptr, magic_code);
+			put(ptr, len);
+			put(ptr, m);
+			send_msg(std::move(buffer));
+		}
+
+		void attach_conntion(xnet::connection &&conn)
+		{
+			if (conn_.valid())
+				throw std::logic_error("connection is valid");
+
+			conn_ = std::move(conn);
+			init();
+		}
+
+		void set_msg_callback(const std::function<bool(msg &&)> &handle)
+		{
+			msg_callback_ = handle;
+		}
+
+	private:
 		void init()
 		{
+			msg_queue_.check_read();
 			conn_.regist_send_callback([this](std::size_t len) {
 
 				if (!len)
-				{
-					close();
-					return;
-				}
+					return close();
 				send_msg();
 
 			}).regist_recv_callback([this](char *data, std::size_t len) {
@@ -173,27 +384,39 @@ namespace xactor
 				uint8_t *end = ptr + len;
 
 				if (!len)
-				{
-					close();
-					return;
-				}
+					return close();
+
 				if (status_ == e_head)
 				{
-					auto magic_code = xutil::endec::get<int>(ptr, end);
-					if (magic_code != header_.magic_num)
+					auto code = xutil::endec::get<int>(ptr, end);
+					if (code != magic_code)
 					{
-						std::cout << "magic_code error " << magic_code << std::endl;
+						std::cout << "magic_code error " << code << std::endl;
 						return close();
 					}
-					header_.length_ = xutil::endec::get<int>(ptr, end);
+					auto length = xutil::endec::get<int>(ptr, end);
 					status_ = e_data;
-					conn_.async_recv(header_.length_);
+					conn_.async_recv(length);
 				}
 				else if(status_ == e_data)
 				{
 					try
 					{
-						msg_callback_(std::move(xutil::endec::get<msg>(ptr, end)));
+						if (!msg_callback_(xutil::endec::get<msg>(ptr, end)))
+						{
+							notify::address_error error;
+
+							auto m = to_msg<msg>(data, len);
+
+							error.address_ = m.to_;
+							m.data_ = to_data(error);
+							m.to_ = m.from_;
+							m.from_.engine_id_ = m.to_.engine_id_;
+							m.from_.actor_id_ = 0;//
+							m.name_ = get_msg_name(&error);
+
+							send_msg(m);
+						}
 					}
 					catch (const std::exception& e)
 					{
@@ -201,8 +424,8 @@ namespace xactor
 						return close();
 					}
 				}
+			}).async_recv(sizeof(msg_header));
 
-			}).async_recv(sizeof(header));
 			status_ = e_head;
 		}
 		void send_msg()
@@ -211,7 +434,6 @@ namespace xactor
 			if (!item.first)
 				return;
 			conn_.async_send(std::move(item.second));
-
 		}
 		void regist_send()
 		{
@@ -231,9 +453,8 @@ namespace xactor
 			e_data,
 		}status_;
 
-		header header_ = {0, 0};
 		std::function<void()> close_callback_;
-		std::function<void(msg &&)> msg_callback_;
+		std::function<bool (msg &&)> msg_callback_;
 		msgbox_t &msgbox_;
 		std::mutex msg_queue_lock_;
 		xutil::ypipe<std::string> msg_queue_;
@@ -244,20 +465,21 @@ namespace xactor
 	class xengine
 	{
 	public:
-		xengine()
+		xengine(std::size_t io_threads = std::thread::hardware_concurrency())
+			:proactor_pool_(io_threads),
+			worker_size_(io_threads)
+			
 		{
-
 		}
 		void regist_actor()
 		{
-
 		}
 		void bind(const std::string &ip, int port)
 		{
-			proactor_.regist_accept_callback([](xnet::connection &&conn){
-
+			proactor_pool_.regist_accept_callback([this](xnet::connection &&conn){
+				handle_conn(std::forward<xnet::connection>(conn));
 			});
-			proactor_.bind(ip, port);
+			proactor_pool_.bind(ip, port);
 		}
 		int workers()
 		{
@@ -267,29 +489,69 @@ namespace xactor
 		{
 			worker_size_ = size;
 		}
+		void start()
+		{
+			proactor_pool_.start();
+			worker_pool_.reset(new xutil::xworker_pool(worker_size_));
+		}
+
+		//create actor
+		template<typename Actor, typename ...Args>
+		typename std::enable_if<std::is_base_of<actor, Actor>::value, address>::type
+			spawn(Args &&...args)
+		{
+			std::shared_ptr<actor> _actor(std::make_shared<Actor>(
+				std::forward<Args>(args)...));
+
+			_actor->addr_.actor_id_ = actor_index_++;
+			_actor->addr_.engine_id_ = engine_id_;
+			_actor->msg_queue_.check_read();
+			_actor->send_msg_ = [this](msg &&m) {
+				send_msg(std::move(m));
+			};
+			_actor->close_ = [this](address addr){
+				del_actor(addr);
+			};
+			add_actor(_actor);
+			_actor->send(_actor->addr_, sys::init());
+			return _actor->addr_;
+		}
 	private:
 
-		static constexpr int magic_code = 1213141516;
 		struct handshake
 		{
-			int magic_code_;
-			int from_;
-			int to_;
-			int role;
-			XENDEC(magic_code_, from_, to_, role);
-		};
-		struct endpoint
-		{
-			
+			struct req
+			{
+				int magic_code_ = magic_code;
+				engine_id from_;
+				engine_id to_;
+				int role;
+				XENDEC(magic_code_, from_, to_, role);
+			};
+
+			struct resp 
+			{
+				enum result_t
+				{
+					e_ok,
+					e_error_
+				};
+				int magic_code_ = magic_code;
+				engine_id from_;
+				engine_id to_;
+				result_t result_;
+				XENDEC(magic_code_, from_, to_, result_);
+			};
 		public:
-			endpoint(xnet::connection &&_conn)
+			handshake(xnet::connection &&_conn)
 				:conn_(std::move(_conn))
 			{
 				
 			}
-			void init()
+			void start()
 			{
-				conn_.regist_recv_callback([this](char *data, std::size_t len) {
+				conn_.regist_recv_callback(
+					[this](char *data,std::size_t len) {
 
 					if (!len)
 						return close();
@@ -297,17 +559,19 @@ namespace xactor
 					uint8_t *end = ptr + len;
 					try
 					{
-						handshake h = xutil::endec::get<handshake>(ptr, end);
-						if (h.magic_code_ != magic_code)
+						req re = xutil::endec::get<req>(ptr, end);
+						if (re.magic_code_ != magic_code)
 							throw std::logic_error("magic code error " +
-								std::to_string(h.magic_code_));
-						if (h.to_ != engine_id_)
-							throw std::logic_error("engine_id not match engine_id:" +
-								std::to_string(engine_id_) +
-								" handshake::to_" +
-								std::to_string(h.to_));
+								std::to_string(re.magic_code_));
 
-						handle_handeshake_(h);
+						if (re.to_ != engine_id_ || re.from_ < engine_id_)
+						{
+							conn_.async_send(make_handshake_resp(engine_id_, 
+								re.from_,
+								resp::e_error_));
+							return;
+						}
+						handle_handeshake_(re);
 					}
 					catch (const std::exception& e)
 					{
@@ -320,7 +584,21 @@ namespace xactor
 						return close();
 				});
 
-				conn_.async_recv(sizeof(handshake));
+				conn_.async_recv(sizeof(req));
+			}
+
+			static std::string make_handshake_resp(engine_id from, 
+				engine_id to, handshake::resp::result_t result)
+			{
+				handshake::resp resp;
+				resp.from_ = from;
+				resp.to_ = to;
+				resp.result_ = result;
+				std::string buffer;
+				buffer.resize(resp.xget_sizeof());
+				uint8_t *ptr = (uint8_t*)buffer.data();
+				xutil::endec::put(ptr, resp);
+				return buffer;
 			}
 			void close()
 			{
@@ -329,26 +607,33 @@ namespace xactor
 			}
 
 			std::function<void()> close_callback_;
-			std::function<void(const handshake&)> handle_handeshake_;
+			std::function<void(const handshake::req&)> handle_handeshake_;
 			xnet::connection conn_;
-			address addr_;
 			engine_id engine_id_;
 
-			std::list<endpoint>::iterator endpoints_itr_;
+			std::list<handshake>::iterator endpoints_itr_;
 		};
-		struct endpoints
+		struct handshakes
 		{
 			std::mutex mutex_;
-			std::list<endpoint> endpoints_;
+			std::list<handshake> endpoints_;
 
 		};
-		using endpoints_itr = std::list<endpoint>::iterator;
+		using handshake_itr = std::list<handshake>::iterator;
 
 
 		struct actors
 		{
 			std::mutex mutex_;
-			std::map<address, actor::ptr_t, address_less> actors_;;
+			std::map<address, actor::ptr_t, address::address_less> actors_;;
+		};
+
+		struct sessions
+		{
+			std::mutex mutex_;
+			std::map<session::session_id, 
+				std::unique_ptr<session>, 
+				session::session_id::session_id_less> sessions_;
 		};
 
 		void init()
@@ -356,22 +641,44 @@ namespace xactor
 			worker_pool_.reset(new xutil::xworker_pool());
 		}
 
+		void send_msg(msg &&m)
+		{
+			if (m.from_.engine_id_ == engine_id_)
+			{
+				handle_msg(std::move(m));
+			}
+			else if(m.from_.engine_id_ == 0)
+			{
+				if (m.name_ == get_msg_name<sys::set_timer>())
+				{
+
+				}
+				else if(m.name_ == get_msg_name<sys::cancel_timer>())
+				{
+
+				}
+			}
+			else
+			{
+
+			}
+		}
 		bool handle_msg(msg &&m)
 		{
 			std::lock_guard<std::mutex> lg(actors_.mutex_);
-			auto itr = actors_.actors_.find(m.dest_);
+			auto itr = actors_.actors_.find(m.to_);
 			if (itr == actors_.actors_.end())
 				return false;
 			if (!itr->second->recv(std::move(m)))
-				to_apply_msg(itr->second);
-			
+				post_apply_msg(itr->second);
+			return true;
 		}
 
-		void to_apply_msg(const actor::ptr_t &actor_)
+		void post_apply_msg(const actor::ptr_t &actor_)
 		{
-			actor::wptr_t actor_ = actor_;
-			auto job = [actor_, this] {
-				apply_msg(actor_);
+			actor::wptr_t actor_wptr_ = actor_;
+			auto job = [actor_wptr_, this] {
+				apply_msg(actor_wptr_);
 			};
 			worker_pool_->add_job(std::move(job));
 		}
@@ -382,46 +689,92 @@ namespace xactor
 			if (actor_) 
 			{
 				if (actor_->apply_once())
-					to_apply_msg(actor_);
+					post_apply_msg(actor_);
 			}
 		}
-		void remove_endpoint(const endpoints_itr& itr)
-		{
-			std::lock_guard<std::mutex> lg(endpoints_.mutex_);
-			endpoints_.endpoints_.erase(itr);
-		}
-		void handle_handshake(endpoints_itr const& itr, const handshake &h)
-		{
 
-		}
-		void add_endpoint(xnet::connection &&conn)
+		void remove_handshake(const handshake_itr& itr)
 		{
-			endpoint e(std::move(conn));
-			endpoints_itr itr;
+			std::lock_guard<std::mutex> lg(handshakes_.mutex_);
+			handshakes_.endpoints_.erase(itr);
+		}
+	
+		void handle_handshake(xnet::connection &&conn,
+			const handshake::req &req)
+		{
+			session::session_id id;
+			id.peer_ = req.from_;
+			id.self_ = engine_id_;
+
+			auto resp = handshake::make_handshake_resp(engine_id_, 
+				req.from_, handshake::resp::e_ok);
+
+			std::lock_guard<std::mutex> lg(sessions_.mutex_);
+			auto itr = sessions_.sessions_.find(id);
+			if (itr != sessions_.sessions_.end())
+			{
+				itr->second->attach_conntion(std::move(conn));
+				itr->second->send_msg(std::move(resp));
+			}
+			else
+			{
+				std::unique_ptr<session> ptr;
+				auto &mailbox = proactor_pool_.get_current_msgbox();
+				ptr.reset(new session(std::move(conn), mailbox));
+				ptr->send_msg(std::move(resp));
+				ptr->set_msg_callback([this](msg &&m){
+					return handle_msg(std::move(m));
+				});
+				sessions_.sessions_.emplace(id, std::move(ptr));
+			}
+		}
+
+		void handle_conn(xnet::connection &&conn)
+		{
+			handshake _handshake(std::move(conn));
+			handshake_itr itr;
 			do 
 			{
-				std::lock_guard<std::mutex> lg(endpoints_.mutex_);
-				itr = endpoints_.endpoints_.insert(endpoints_.endpoints_.end(), std::move(e));
-
+				std::lock_guard<std::mutex> lg(handshakes_.mutex_);
+				itr = handshakes_.endpoints_.insert(
+					handshakes_.endpoints_.end(), std::move(_handshake));
 			} while (0);
+
 			itr->engine_id_ = engine_id_;
 			itr->endpoints_itr_ = itr;
 			itr->close_callback_ = [itr, this]{
-				remove_endpoint(itr);
+				remove_handshake(itr);
 			};
-			itr->handle_handeshake_ = [itr, this](const handshake &h) {
-				handle_handshake(itr, h);
+			itr->handle_handeshake_ = [itr, this](const handshake::req &req) {
+
+				handle_handshake(std::move(itr->conn_), req);
+				remove_handshake(itr);
 			};
-			itr->init();
+			itr->start();
 		}
 
+		void add_actor(std::shared_ptr<actor> _actor)
+		{
+			std::lock_guard<std::mutex> lg(actors_.mutex_);
+			actors_.actors_.emplace(_actor->get_address(), std::move(_actor));
+		}
+
+		void del_actor(const address &addr)
+		{
+			std::lock_guard<std::mutex> lg(actors_.mutex_);
+			actors_.actors_.erase(addr);
+		}
+
+		uint64_t actor_index_ = 1;
+
 		actors actors_;
-		endpoints endpoints_;
+		handshakes handshakes_;
+		sessions sessions_;
 
-		int worker_size_;
+		int worker_size_ = 0;
+		xnet::proactor_pool proactor_pool_;
 		std::unique_ptr<xutil::xworker_pool> worker_pool_;
-		xnet::proactor_pool proactor_;
 
-		engine_id engine_id_;
+		engine_id engine_id_ = 0;
 	};
 }
