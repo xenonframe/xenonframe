@@ -13,9 +13,25 @@ namespace xactor
 {
 	
 
+
+	using engine_id = int64_t;
+
 	struct address
 	{
+		engine_id engine_id_;
 		int64_t actor_id_;
+		XENDEC(engine_id_, actor_id_);
+	};
+	struct address_less 
+	{
+		bool operator()(const address &lhs, const address &rhs) const
+		{
+			if (lhs.engine_id_ < rhs.engine_id_)
+				return true;
+			else if (lhs.actor_id_ < rhs.actor_id_)
+				return true;
+			return false;
+		}
 	};
 
 	/*
@@ -30,15 +46,19 @@ namespace xactor
 		std::string data_;
 		XENDEC(source_, dest_, type_, data_);
 	};
-	template<typename MSG>
-	inline std::string get_msg_name()
+
+
+	template<typename T>
+	inline constexpr char *get_msg_name()
 	{
-		return MSG::name;
+		return T::name;
 	}
-	template<typename MSG>
-	inline MSG to_msg(const std::string &data)
+
+
+	template<typename T>
+	inline T to_msg(const std::string &data)
 	{
-		return MSG();
+		return T();
 	}
 
 	
@@ -49,7 +69,6 @@ namespace xactor
 		using ptr_t = std::shared_ptr<actor>;
 		using wptr_t = std::weak_ptr<actor>;
 
-
 		actor()
 		{
 
@@ -59,10 +78,10 @@ namespace xactor
 
 		}
 	protected:
-		template<typename MSG>
-		void regist_msg(const std::function<void(MSG &&)>& func)
+		template<typename T>
+		void regist_msg(const std::function<void(T &&)>& func)
 		{
-			auto type = get_msg_name<MSG>();
+			auto type = get_msg_name<T>();
 			auto itr = msg_handles_.find(type);
 			if (itr != msg_handles_.end())
 				throw std::logic_error(type + " repeated regist");
@@ -203,8 +222,8 @@ namespace xactor
 		}
 		void close()
 		{
-			close_callback_();
 			conn_.close();
+			close_callback_();
 		}
 		enum 
 		{
@@ -220,6 +239,7 @@ namespace xactor
 		xutil::ypipe<std::string> msg_queue_;
 		xnet::connection conn_;
 	};
+
 
 	class xengine
 	{
@@ -248,6 +268,89 @@ namespace xactor
 			worker_size_ = size;
 		}
 	private:
+
+		static constexpr int magic_code = 1213141516;
+		struct handshake
+		{
+			int magic_code_;
+			int from_;
+			int to_;
+			int role;
+			XENDEC(magic_code_, from_, to_, role);
+		};
+		struct endpoint
+		{
+			
+		public:
+			endpoint(xnet::connection &&_conn)
+				:conn_(std::move(_conn))
+			{
+				
+			}
+			void init()
+			{
+				conn_.regist_recv_callback([this](char *data, std::size_t len) {
+
+					if (!len)
+						return close();
+					uint8_t *ptr = reinterpret_cast<uint8_t*>(data);
+					uint8_t *end = ptr + len;
+					try
+					{
+						handshake h = xutil::endec::get<handshake>(ptr, end);
+						if (h.magic_code_ != magic_code)
+							throw std::logic_error("magic code error " +
+								std::to_string(h.magic_code_));
+						if (h.to_ != engine_id_)
+							throw std::logic_error("engine_id not match engine_id:" +
+								std::to_string(engine_id_) +
+								" handshake::to_" +
+								std::to_string(h.to_));
+
+						handle_handeshake_(h);
+					}
+					catch (const std::exception& e)
+					{
+						std::cout << e.what() << std::endl;
+						return close();
+					}
+				});
+				conn_.regist_send_callback([this](auto len) {
+					if (!len)
+						return close();
+				});
+
+				conn_.async_recv(sizeof(handshake));
+			}
+			void close()
+			{
+				close_callback_();
+				conn_.close();
+			}
+
+			std::function<void()> close_callback_;
+			std::function<void(const handshake&)> handle_handeshake_;
+			xnet::connection conn_;
+			address addr_;
+			engine_id engine_id_;
+
+			std::list<endpoint>::iterator endpoints_itr_;
+		};
+		struct endpoints
+		{
+			std::mutex mutex_;
+			std::list<endpoint> endpoints_;
+
+		};
+		using endpoints_itr = std::list<endpoint>::iterator;
+
+
+		struct actors
+		{
+			std::mutex mutex_;
+			std::map<address, actor::ptr_t, address_less> actors_;;
+		};
+
 		void init()
 		{
 			worker_pool_.reset(new xutil::xworker_pool());
@@ -282,16 +385,43 @@ namespace xactor
 					to_apply_msg(actor_);
 			}
 		}
-		struct actors 
+		void remove_endpoint(const endpoints_itr& itr)
 		{
-			std::mutex mutex_;
-			std::map<address, actor::ptr_t> actors_;;
-		};
+			std::lock_guard<std::mutex> lg(endpoints_.mutex_);
+			endpoints_.endpoints_.erase(itr);
+		}
+		void handle_handshake(endpoints_itr const& itr, const handshake &h)
+		{
+
+		}
+		void add_endpoint(xnet::connection &&conn)
+		{
+			endpoint e(std::move(conn));
+			endpoints_itr itr;
+			do 
+			{
+				std::lock_guard<std::mutex> lg(endpoints_.mutex_);
+				itr = endpoints_.endpoints_.insert(endpoints_.endpoints_.end(), std::move(e));
+
+			} while (0);
+			itr->engine_id_ = engine_id_;
+			itr->endpoints_itr_ = itr;
+			itr->close_callback_ = [itr, this]{
+				remove_endpoint(itr);
+			};
+			itr->handle_handeshake_ = [itr, this](const handshake &h) {
+				handle_handshake(itr, h);
+			};
+			itr->init();
+		}
 
 		actors actors_;
+		endpoints endpoints_;
 
 		int worker_size_;
 		std::unique_ptr<xutil::xworker_pool> worker_pool_;
 		xnet::proactor_pool proactor_;
+
+		engine_id engine_id_;
 	};
 }
