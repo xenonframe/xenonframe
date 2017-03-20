@@ -93,9 +93,6 @@
     <ClInclude Include="..\..\..\..\src\xnet\detail\select.hpp">
       <Filter>xnet\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\xnet\detail\timer.hpp">
-      <Filter>xnet\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\xnet\detail\detail.hpp">
       <Filter>xnet\detail</Filter>
     </ClInclude>
@@ -436,6 +433,9 @@
       <Filter>xutil</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\xutil\gen_endec.hpp">
+      <Filter>xutil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\xutil\timer.hpp">
       <Filter>xutil</Filter>
     </ClInclude>
   </ItemGroup>

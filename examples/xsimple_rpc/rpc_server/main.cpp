@@ -23,9 +23,19 @@ int main()
 
 	xsimple_rpc::rpc_server server(RPP);
 	server.bind("0.0.0.0", 9001);
-	server.regist("add", [](int a, int &b) { return a + b; });
-	server.regist("hello", [](const std::string &) { return std::string("hello world"); });
-	server.regist("add_str", [](int a, const std::string &str ) {return str + std::to_string(a); });
+	
+	server.regist("add", [](int a, int &b) { 
+		return a + b; 
+	});
+	
+	server.regist("hello", [](const std::string &) { 
+		return std::string("hello world"); 
+	});
+
+	server.regist("add_str", [](int a, const std::string &str ) {
+		return str + std::to_string(a); 
+	});
+
 	//struct test
 	MyStruct obj;
 	obj.hello = "hello";

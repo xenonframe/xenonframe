@@ -112,7 +112,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\examples\xactor\unit_test\hello%24world.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\examples\xactor\unit_test\hello_world.cpp" />
+    <ClCompile Include="timer_test.cpp" />
     <ClCompile Include="watch_test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

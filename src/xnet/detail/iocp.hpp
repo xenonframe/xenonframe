@@ -523,7 +523,6 @@ namespace iocp
 	class proactor_impl
 	{
 	public:
-		typedef timer_manager::timer_id timer_id;
 		proactor_impl()
 		{
 

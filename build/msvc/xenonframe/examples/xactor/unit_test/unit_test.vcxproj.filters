@@ -15,10 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\examples\xactor\unit_test\hello%24world.cpp">
+    <ClCompile Include="timer_test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="watch_test.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\examples\xactor\unit_test\hello_world.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -651,7 +651,7 @@ namespace epoll
 		{
 			return timer_manager_.set_timer(timeout, std::forward<T>(timer_callback));
 		}
-		void cancel_timer(timer_manager::timer_id id)
+		void cancel_timer(timer_id id)
 		{
 			timer_manager_.cancel_timer(id);
 		}

@@ -30,6 +30,11 @@ namespace xactor
 		};
 		XENDEC(engine_id_, actor_id_);
 	};
+	inline std::ostream & operator<<(std::ostream &output, address addr)
+	{
+		output << " engine_id:" << addr.engine_id_ << " actor_id:" << addr.actor_id_;
+		return output;
+	}
 
 	/*
 	| magic_code| msg length| from | to | msg type | msg |
@@ -37,7 +42,7 @@ namespace xactor
 
 #define RegistActorMsg(MsgName,...) \
 	static constexpr char *_$_actor_msg_type_ = \
-	"User::"#MsgName; \
+	"actor::"#MsgName; \
 	XENDEC(__VA_ARGS__);
 
 #define RegistSysMsg(MsgName,...) \
@@ -104,7 +109,6 @@ namespace xactor
 		return buffer;
 	}
 
-
 	namespace notify 
 	{
 		struct address_error
@@ -140,34 +144,29 @@ namespace xactor
 			RegistSysMsg(watch, _);
 		};
 
-		struct set_timer 
-		{
-			int32_t millis_;
-			uint32_t timer_id_;
-			RegistSysMsg(set_timer, millis_, timer_id_);
-		};
-
-		struct cancel_timer
-		{
-			uint32_t timer_id_;
-			RegistSysMsg(cancel_timer, timer_id_);
-		};
-
 		struct timer_expire
 		{
 			uint32_t timer_id_;
 			RegistSysMsg(timer_expire, timer_id_);
 		};
 	}
-
+	class xengine;
+	class actor;
+	namespace detail
+	{
+		template<typename Actor, typename ...Args>
+		inline typename std::enable_if<std::is_base_of<actor, Actor>::value, address>::type
+			spawn(xengine &engine, Args &&...args);
+	}
 	class actor
 	{
 	public:
 		using ptr_t = std::shared_ptr<actor>;
 		using wptr_t = std::weak_ptr<actor>;
+		using timer_id = xutil::timer_id;
+
 		actor()
 		{
-
 		}
 		virtual ~actor()
 		{
@@ -184,39 +183,31 @@ namespace xactor
 		}
 
 		template<typename T>
-		void regist(const std::function<void(const address &from, T &&)>& func)
+		void regist(T &&lamdba)
 		{
-			auto type = get_msg_name<T>();
-			auto itr = msg_handles_.find(type);
-			if (itr != msg_handles_.end())
-				throw std::logic_error(type + std::string(" repeated regist"));
-			msg_handles_.emplace(type, [func](const msg &m){
-				func(m.from_, to_msg<T>(m.data_));
-			});
+			return regist_impl(xutil::to_function(lamdba));
 		}
 
-		uint32_t set_timer(int32_t millis, const std::function<void()> &func)
+		xutil::timer_id set_timer(std::size_t millis, std::function<bool()> &&func)
 		{
-			timer_handle_.emplace(timer_index_, func);
-
-			sys::set_timer set_time_;
-			set_time_.millis_ = millis;
-			set_time_.timer_id_ = timer_index_;
-
-			send({}, set_time_);
-			return timer_index_++;
+			if (!millis)
+				millis = 10;
+			timer_index_++;
+			auto itr = timer_handles_.emplace(timer_index_, std::make_pair(0, std::move(func)));
+			auto id = set_timer_(millis, addr_, timer_index_);
+			itr.first->second.first = id;
+			return timer_index_;
 		}
 
-		void cancel_timer(uint32_t timer_id_)
+		void cancel_timer(timer_id id)
 		{
-			auto itr = timer_handle_.find(timer_id_);
-			if (itr != timer_handle_.end())
+			auto itr = timer_handles_.find(id);
+			if (itr != timer_handles_.end())
 			{
-				timer_handle_.erase(itr);
-				send({}, sys::cancel_timer{ timer_id_ });
+				cancel_timer_(itr->second.first);
+				timer_handles_.erase(itr);
 			}
 		}
-		
 
 		void watch(const address &addr)
 		{
@@ -240,8 +231,30 @@ namespace xactor
 			m.name_ = get_msg_name<T>();
 			send_msg_(std::move(m));
 		}
+
+		template<typename Actor, typename ...Args>
+		typename std::enable_if<std::is_base_of<actor, Actor>::value, address>::type
+			spawn(Args &&...args)
+		{
+			return detail::spawn<Actor>(*engine_, std::forward<decltype(args)>(args)...);
+		}
+
 	private:
 		friend class xengine;
+
+		template<typename T>
+		void regist_impl(const std::function<void(const address &from, T &&)>& func)
+		{
+			auto type = get_msg_name<T>();
+			auto itr = msg_handles_.find(type);
+			if (itr != msg_handles_.end())
+				throw std::logic_error(type + std::string(" repeated regist"));
+			msg_handles_.emplace(type, [func](const msg &m) {
+				func(m.from_, to_msg<T>(m.data_));
+			});
+		}
+
+
 		bool recv(msg &&m)
 		{
 			msg_queue_.write(std::move(m));
@@ -261,7 +274,19 @@ namespace xactor
 			apply(m.second);
 			return msg_queue_.check_read();
 		}
-
+		void timer_expire(sys::timer_expire _timer_expire)
+		{
+			auto itr = timer_handles_.find(_timer_expire.timer_id_);
+			if (itr != timer_handles_.end())
+			{
+				if (!itr->second.second())
+				{
+					cancel_timer_(itr->second.first);
+					timer_handles_.erase(itr);
+				}
+					
+			}
+		}
 		void apply(const msg &m)
 		{
 			auto itr = msg_handles_.find(m.name_);
@@ -276,6 +301,10 @@ namespace xactor
 					std::cout << e.what() << std::endl;
 				}
 			}
+			else if (m.name_ == get_msg_name<sys::timer_expire>())
+			{
+				timer_expire(to_msg<sys::timer_expire>(m.data_));
+			}
 			else if (m.name_ == get_msg_name<sys::watch>())
 			{
 				observers_.insert(m.from_);
@@ -284,6 +313,11 @@ namespace xactor
 			{
 				init();
 			}
+			else
+			{
+				std::cout << "can't find msg handle [" << m.name_ << "] "<< addr_ << std::endl;
+
+			}
 		}
 		using msg_handle_t = std::function<void(const msg &)>;
 		std::map<std::string, msg_handle_t> msg_handles_;
@@ -291,12 +325,16 @@ namespace xactor
 		xutil::ypipe<msg> msg_queue_;
 
 		std::function<void(msg &&)> send_msg_;
+		std::function<timer_id(std::size_t, const address&, timer_id)> set_timer_;
+		std::function<void(timer_id)> cancel_timer_;
+
 		std::function<void(address )> close_;
 
 		std::set<address, address::address_less> observers_;
-		std::map<uint32_t, std::function<void()>> timer_handle_;
+		std::map<uint32_t, std::pair<timer_id, std::function<bool ()>>> timer_handles_;
+		timer_id timer_index_ = 1;
 
-		uint32_t timer_index_ = 1;
+		xengine *engine_;
 	};
 
 	class session 
@@ -491,10 +529,22 @@ namespace xactor
 		}
 		void start()
 		{
+			if (is_start_)
+				return;
+			std::cout << "worker_size_:" << worker_size_ << std::endl;
+			is_start_ = true;
 			proactor_pool_.start();
+			timer_.start();
 			worker_pool_.reset(new xutil::xworker_pool(worker_size_));
 		}
-
+		void stop()
+		{
+			if (!is_start_)
+				return;
+			timer_.stop();
+			worker_pool_->stop();
+			proactor_pool_.stop();
+		}
 		//create actor
 		template<typename Actor, typename ...Args>
 		typename std::enable_if<std::is_base_of<actor, Actor>::value, address>::type
@@ -506,15 +556,50 @@ namespace xactor
 			_actor->addr_.actor_id_ = actor_index_++;
 			_actor->addr_.engine_id_ = engine_id_;
 			_actor->msg_queue_.check_read();
+			_actor->engine_ = this;
 			_actor->send_msg_ = [this](msg &&m) {
 				send_msg(std::move(m));
 			};
 			_actor->close_ = [this](address addr){
 				del_actor(addr);
 			};
+			_actor->set_timer_ = [this](std::size_t delay, 
+				const address &addr, 
+				xutil::timer_id id) {
+				return timer_.set_timer(delay, [this,addr,id] {
+					sys::timer_expire timer_expire_;
+					timer_expire_.timer_id_ = id;
+					msg m;
+					m.data_ = to_data(timer_expire_);
+					m.from_ = addr;
+					m.to_ = addr;
+					m.name_ = get_msg_name(&timer_expire_);
+					send_msg(std::move(m));
+					return true;
+				});
+			};
+			_actor->cancel_timer_ = [this](auto id) {
+				timer_.cancel_timer(id);
+			};
 			add_actor(_actor);
 			_actor->send(_actor->addr_, sys::init());
 			return _actor->addr_;
+		}
+
+		void send(msg &&m)
+		{
+			send_msg(std::forward<msg>(m));
+		}
+
+		template<typename T>
+		void send(const address &to, T &&obj)
+		{
+			msg m;
+			m.data_ = to_data(obj);
+			m.from_.engine_id_ = engine_id_;
+			m.to_ = to;
+			m.name_ = get_msg_name(&obj);
+			send_msg(std::move(m));
 		}
 	private:
 
@@ -631,7 +716,7 @@ namespace xactor
 		struct sessions
 		{
 			std::mutex mutex_;
-			std::map<session::session_id, 
+			std::map<session::session_id,
 				std::unique_ptr<session>, 
 				session::session_id::session_id_less> sessions_;
 		};
@@ -647,19 +732,10 @@ namespace xactor
 			{
 				handle_msg(std::move(m));
 			}
-			else if(m.from_.engine_id_ == 0)
-			{
-				if (m.name_ == get_msg_name<sys::set_timer>())
-				{
-
-				}
-				else if(m.name_ == get_msg_name<sys::cancel_timer>())
-				{
-
-				}
-			}
 			else
 			{
+				std::lock_guard<std::mutex> lg(sessions_.mutex_);
+
 
 			}
 		}
@@ -764,6 +840,7 @@ namespace xactor
 			std::lock_guard<std::mutex> lg(actors_.mutex_);
 			actors_.actors_.erase(addr);
 		}
+		std::atomic_bool is_start_{ false };
 
 		uint64_t actor_index_ = 1;
 
@@ -774,7 +851,21 @@ namespace xactor
 		int worker_size_ = 0;
 		xnet::proactor_pool proactor_pool_;
 		std::unique_ptr<xutil::xworker_pool> worker_pool_;
+		xutil::timer timer_;
 
 		engine_id engine_id_ = 0;
+	};
+	namespace detail
+	{
+		template<typename Actor, typename ...Args>
+		inline typename std::enable_if<std::is_base_of<actor, Actor>::value, address>::type
+			spawn(xengine &engine, Args &&...args)
+		{
+			return engine.spawn<Actor>(std::forward<decltype(args)>(args)...);
+		}
+	}
+	class actor_keeper
+	{
+
 	};
 }

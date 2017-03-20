@@ -14,7 +14,7 @@ namespace xutil
 
 		void push(T &&item)
 		{
-			std::unique_lock<std::mutex> locker(mtex_);
+			std::lock_guard<std::mutex> locker(mtex_);
 			queue_.push(std::forward<T>(item));
 			cv_.notify_one();
 		}
@@ -24,17 +24,9 @@ namespace xutil
 			std::unique_lock<std::mutex> locker(mtex_);
 			if (queue_.empty())
 			{
-				if (timeout_mills == 0)
-					cv_.wait(locker, [this] { return queue_.size(); });
-				else
-				{
-					auto ret = cv_.wait_for(locker,
-						std::chrono::milliseconds(timeout_mills),[this] {
-						return !!queue_.size(); 
-					});
-					if (!ret)
-						return false;
-				}
+				cv_.wait_for(locker,std::chrono::milliseconds(timeout_mills));
+				if (queue_.empty())
+					return false;
 			}
 			job = std::move(queue_.front());
 			queue_.pop();

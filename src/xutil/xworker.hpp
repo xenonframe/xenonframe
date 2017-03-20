@@ -17,7 +17,8 @@ namespace xutil
 		}
 		~xworker()
 		{
-			stop();
+			if(!is_stop_)
+				stop();
 		}
 		void add_job(job_t &&job)
 		{
@@ -26,9 +27,8 @@ namespace xutil
 		void stop()
 		{
 			is_stop_ = true;
-			job_queue_.push([this] {});
-			if(thread_.joinable())
-				thread_.join();
+			job_queue_.push([] {});
+			thread_.join();
 		}
 		bool steal_job(job_t &job)
 		{
@@ -51,7 +51,7 @@ namespace xutil
 						job();
 						continue;
 					}
-					if (steal_job_ && steal_job_(job))
+					if (steal_job_(job))
 					{
 						job();
 					}

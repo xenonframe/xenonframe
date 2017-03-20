@@ -16,13 +16,13 @@
 #include <cstring>
 #include <atomic>
 #include <malloc.h>
-#include "timer.hpp"
+#include "../../xutil/timer.hpp"
 
 #if defined _MSC_VER
 #undef FD_SETSIZE
 #define FD_SETSIZE      1024
 #ifndef IOCP
-#define IOCP 1
+#define IOCP 0
 #endif
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -56,6 +56,14 @@ typedef int SOCKET;
 #include "exceptions.hpp"
 #include "functional.hpp"
 #endif
+
+namespace xnet
+{
+	using xutil::timer_manager;
+	using xutil::timer_id;
+
+}
+
 #if IOCP
 #include "iocp.hpp"
 #elif EPOLL 

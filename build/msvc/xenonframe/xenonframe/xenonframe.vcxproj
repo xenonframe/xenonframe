@@ -56,7 +56,6 @@
     <ClInclude Include="..\..\..\..\src\xnet\detail\functional.hpp" />
     <ClInclude Include="..\..\..\..\src\xnet\detail\iocp.hpp" />
     <ClInclude Include="..\..\..\..\src\xnet\detail\select.hpp" />
-    <ClInclude Include="..\..\..\..\src\xnet\detail\timer.hpp" />
     <ClInclude Include="..\..\..\..\src\xnet\msgbox.hpp" />
     <ClInclude Include="..\..\..\..\src\xnet\proactor.hpp" />
     <ClInclude Include="..\..\..\..\src\xnet\proactor_pool.hpp" />
@@ -125,6 +124,7 @@
     <ClInclude Include="..\..\..\..\src\xutil\no_copy_able.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\sha1.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\sync_queue.hpp" />
+    <ClInclude Include="..\..\..\..\src\xutil\timer.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\vfs.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\xworker.hpp" />
     <ClInclude Include="..\..\..\..\src\xutil\xworker_pool.hpp" />

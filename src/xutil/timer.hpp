@@ -1,10 +1,14 @@
 #pragma once
 #include <chrono>
-namespace xnet
+#include <map>
+#include <functional>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
+namespace xutil
 {
-
 	using namespace std::chrono;
-
 	struct xtimer
 	{
 		std::size_t timer_id_;
@@ -29,12 +33,13 @@ namespace xnet
 			return CLOCK::now();
 		}
 	};
+	using timer_id = std::size_t ;
+
 	class timer_manager :
 		public std::multimap<
 		std::chrono::high_resolution_clock::time_point, xtimer>
 	{
 	public:
-		typedef std::size_t timer_id;
 		timer_manager()
 		{
 
@@ -44,7 +49,9 @@ namespace xnet
 			if (empty())
 				return 0;
 			auto itr = begin();
-			duration_caster<milliseconds, high_resolution_clock::duration> caster;
+			duration_caster<milliseconds,
+				high_resolution_clock::duration> caster;
+
 			time_pointer<high_resolution_clock> time_point;
 			auto now = time_point();
 			while (size() &&
@@ -97,5 +104,57 @@ namespace xnet
 		}
 	private:
 		std::size_t next_id_ = 0;
+	};
+
+	class timer
+	{
+	public:
+		timer()
+		{
+		}
+		~timer()
+		{
+		}
+		template<typename T>
+		timer_id set_timer(
+			std::size_t timeout,
+			T &&timer_callback)
+		{
+			std::lock_guard<std::mutex> lg(mutex_);
+			auto id = timer_manager_.set_timer(timeout, 
+				std::forward<T>(timer_callback));
+			cv_.notify_one();
+			return id;
+		}
+		void cancel_timer(std::size_t id)
+		{
+			return timer_manager_.cancel_timer(id);
+		}
+		void start()
+		{
+			worker_ = std::thread([this] {
+				do
+				{
+					std::unique_lock<std::mutex> lg(mutex_);
+					auto delay = timer_manager_.do_timer();
+					if (!delay)
+						delay = 1000;
+					cv_.wait_for(lg, std::chrono::milliseconds(delay));
+
+				} while (!is_stop);
+			});
+		}
+		void stop()
+		{
+			is_stop = true;
+			cv_.notify_one();
+			worker_.join();
+		}
+	private:
+		timer_manager timer_manager_;
+		std::mutex mutex_;
+		std::condition_variable cv_;
+		std::thread worker_;
+		bool is_stop = false;
 	};
 }

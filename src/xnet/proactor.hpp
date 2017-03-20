@@ -4,7 +4,6 @@ namespace xnet
 	class proactor : public xutil::no_copy_able
 	{
 	public:
-		typedef timer_manager::timer_id timer_id;
 		proactor()
 		{
 			impl = new detail::proactor_impl;

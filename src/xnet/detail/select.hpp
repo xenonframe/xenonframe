@@ -418,7 +418,6 @@ namespace select
 		typedef std::vector <fd_context> fd_context_vec;
 
 	public:
-		typedef timer_manager::timer_id timer_id;
 		proactor_impl()
 		{
 
@@ -558,7 +557,7 @@ namespace select
 		{
 			return timer_manager_.set_timer(timeout, std::forward<T>(timer_callback));
 		}
-		void cancel_timer(timer_manager::timer_id id)
+		void cancel_timer(timer_id id)
 		{
 			timer_manager_.cancel_timer(id);
 		}
