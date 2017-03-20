@@ -24,8 +24,8 @@ namespace xutil
 			std::unique_lock<std::mutex> locker(mtex_);
 			if (queue_.empty())
 			{
-				cv_.wait_for(locker,std::chrono::milliseconds(timeout_mills));
-				if (queue_.empty())
+				/*cv_.wait_for(locker, std::chrono::milliseconds(timeout_mills));
+				if (queue_.empty())*/
 					return false;
 			}
 			job = std::move(queue_.front());

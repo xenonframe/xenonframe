@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F1E1EF71-DA9E-4529-9C7F-0C598A2AFC3E}</ProjectGuid>
-    <RootNamespace>unit_test</RootNamespace>
+    <ProjectGuid>{EFE7737C-D26E-4B67-9349-74794E78BFD7}</ProjectGuid>
+    <RootNamespace>threadpool</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -114,9 +114,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\examples\xactor\unit_test\hello_world.cpp" />
-    <ClCompile Include="timer_test.cpp" />
-    <ClCompile Include="watch_test.cpp" />
+    <ClCompile Include="..\..\..\..\..\examples\threadpool\threadpool_test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

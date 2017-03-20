@@ -10,7 +10,7 @@ namespace xutil
 	class xworker_pool
 	{
 	public:
-		xworker_pool(int worker_size = std::thread::hardware_concurrency())
+		xworker_pool(std::size_t  worker_size = std::thread::hardware_concurrency())
 			:worker_size_(worker_size)
 		{
 			init();
@@ -67,7 +67,7 @@ namespace xutil
 
 		std::atomic<uint64_t> index_ { 0 };
 		bool is_init_done_ = false;
-		uint32_t worker_size_;
+		std::size_t  worker_size_;
 		std::vector<std::unique_ptr<xworker>> workers_;
 	};
 }

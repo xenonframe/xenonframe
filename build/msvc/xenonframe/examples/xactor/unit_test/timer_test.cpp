@@ -17,19 +17,33 @@ public:
 private:
 	void handle_mmm()
 	{
-		struct spawn_ :public actor
+		struct timer :public actor
 		{
+		public:
+			timer(uint64_t &msgs)
+				:msgs_(msgs)
+			{
+
+			}
 			void init()
 			{
-				std::cout << "spawn_ init" << std::endl;
+				auto id = set_timer(1000, [this] {
+
+					std::cout << msgs_ - last_msg_ << std::endl;
+					last_msg_ = msgs_;
+					return true;
+				});
 			}
+			uint64_t &msgs_;
+			uint64_t last_msg_ = 0;
 		};
+
+
 		regist([this](const address &from, mmm &&_mmm){
-			
-			if(msgs_++ % 100000== 0)
-				std::cout << _mmm.hello_ << std::endl;
+			msgs_++;
 		});
-		//spawn<spawn_>();
+
+		spawn<timer>(std::ref(msgs_));
 	}
 	void init_handle()
 	{
@@ -38,19 +52,9 @@ private:
 	void init() 
 	{
 		init_handle();
-		auto id = set_timer(1, [this] {
-
-			std::cout << "click." <<std::endl;
-			if (clicks_ < 10)
-			{
-				clicks_++;
-				return true;
-			}
-			return false;
-		});
 	};
 	int clicks_ = 1;
-	int msgs_ = 0;
+	uint64_t msgs_ = 0;
 };
 
 int main()
@@ -60,11 +64,32 @@ int main()
 
 	auto addr = e.spawn<timer_test>();
 	auto addr1 = e.spawn<timer_test>();
+	auto addr2 = e.spawn<timer_test>();
+	auto addr3 = e.spawn<timer_test>();
+	auto addr4 = e.spawn<timer_test>();
+	auto addr5 = e.spawn<timer_test>();
+	auto addr6 = e.spawn<timer_test>();
+
+	auto addr7 = e.spawn<timer_test>();
+	auto addr8 = e.spawn<timer_test>();
+	auto addr9 = e.spawn<timer_test>();
+	auto addr10 = e.spawn<timer_test>();
+
 
 	for (int i = 0; i < 10000001; i++)
 	{
 		e.send(addr, mmm{ "from engine .1 " + std::to_string(i) });
 		e.send(addr1, mmm{ "from engine .2 " + std::to_string(i) });
+		e.send(addr2, mmm{ "from engine .3 " + std::to_string(i) });
+		e.send(addr3, mmm{ "from engine .4 " + std::to_string(i) });
+		e.send(addr4, mmm{ "from engine .5 " + std::to_string(i) });
+		e.send(addr5, mmm{ "from engine .6 " + std::to_string(i) });
+		e.send(addr6, mmm{ "from engine .7 " + std::to_string(i) });
+
+		e.send(addr7, mmm{ "from engine .8 " + std::to_string(i) });
+		e.send(addr8, mmm{ "from engine .9 " + std::to_string(i) });
+		e.send(addr9, mmm{ "from engine .10 " + std::to_string(i) });
+		e.send(addr10, mmm{ "from engine .11 " + std::to_string(i) });
 	}
 
 	getchar();

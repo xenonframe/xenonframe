@@ -46,15 +46,12 @@ namespace xutil
 				while (!is_stop_)
 				{
 					job_t job;
-					if (job_queue_.pop(job, 100))
+					if (job_queue_.pop(job, 100) || steal_job_(job))
 					{
 						job();
 						continue;
 					}
-					if (steal_job_(job))
-					{
-						job();
-					}
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				};
 			}
 			catch (const std::exception& e)

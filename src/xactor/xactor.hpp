@@ -331,7 +331,7 @@ namespace xactor
 		std::function<void(address )> close_;
 
 		std::set<address, address::address_less> observers_;
-		std::map<uint32_t, std::pair<timer_id, std::function<bool ()>>> timer_handles_;
+		std::map<std::size_t, std::pair<timer_id, std::function<bool ()>>> timer_handles_;
 		timer_id timer_index_ = 1;
 
 		xengine *engine_;
@@ -519,7 +519,7 @@ namespace xactor
 			});
 			proactor_pool_.bind(ip, port);
 		}
-		int workers()
+		std::size_t workers()
 		{
 			return worker_size_;
 		}
@@ -848,7 +848,7 @@ namespace xactor
 		handshakes handshakes_;
 		sessions sessions_;
 
-		int worker_size_ = 0;
+		std::size_t worker_size_ = 0;
 		xnet::proactor_pool proactor_pool_;
 		std::unique_ptr<xutil::xworker_pool> worker_pool_;
 		xutil::timer timer_;
