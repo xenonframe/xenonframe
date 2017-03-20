@@ -115,8 +115,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\..\examples\xactor\unit_test\hello_world.cpp" />
+    <ClCompile Include="chameneosredux.cpp" />
     <ClCompile Include="timer_test.cpp" />
     <ClCompile Include="watch_test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="actor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

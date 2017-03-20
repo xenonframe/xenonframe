@@ -57,7 +57,7 @@ private:
 	uint64_t msgs_ = 0;
 };
 
-int main()
+int main0()
 {
 	xengine e;
 	e.start();

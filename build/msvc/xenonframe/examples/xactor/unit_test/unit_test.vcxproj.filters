@@ -24,5 +24,13 @@
     <ClCompile Include="..\..\..\..\..\..\examples\xactor\unit_test\hello_world.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="chameneosredux.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="actor.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
