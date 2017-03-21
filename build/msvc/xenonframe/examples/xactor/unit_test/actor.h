@@ -13,8 +13,10 @@
 
 namespace actor
 {
-	class queue {
-		class message_base {
+	class queue 
+	{
+		class message_base 
+		{
 		public:
 			virtual void* get(const std::type_info& info) = 0;
 			virtual ~message_base() {}
@@ -142,7 +144,8 @@ namespace actor
 			return living;
 		}
 
-		template<typename... Args> void mark_dead(Args&&... args)
+		template<typename... Args> 
+		void mark_dead(Args&&... args)
 		{
 			std::lock_guard<std::mutex> lock(mutex);
 			living = false;
@@ -189,9 +192,15 @@ namespace actor
 	{
 		std::shared_ptr<queue> mailbox;
 	public:
-		handle() {}
-		explicit handle(const std::shared_ptr<queue>& other) noexcept : mailbox(other) {}
-		template<typename... Args> void send(Args&&... args) const {
+		handle()
+		{
+		}
+		explicit handle(const std::shared_ptr<queue>& other)noexcept 
+			: mailbox(other) 
+		{
+		}
+		template<typename... Args> void send(Args&&... args) const 
+		{
 			mailbox->push(std::make_tuple(std::forward<Args>(args)...));
 		}
 		bool monitor() const 
@@ -229,7 +238,8 @@ namespace actor
 		return hidden::self_var;
 	}
 
-	template<typename... Matchers> void receive(const Matchers&... matchers)
+	template<typename... Matchers>
+	void receive(const Matchers&... matchers)
 	{
 		hidden::mailbox->match(matchers...);
 	}
