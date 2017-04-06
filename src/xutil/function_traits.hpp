@@ -1,5 +1,7 @@
 #pragma once
 #include <tuple>
+#include <functional>
+#include <utility>
 
 namespace xutil
 {

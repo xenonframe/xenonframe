@@ -1,6 +1,9 @@
 #pragma once
 #include <cstring>
 #include <time.h>
+#include <ctype.h>
+#include <string>
+#include <string.h>
 namespace xutil
 {
 	namespace functional
@@ -72,9 +75,9 @@ namespace xutil
 		{
 			std::string buffer;
 			for (auto &itr : str)
-				buffer.push_back((char)(::tolower(itr)));
+				buffer.push_back((char)::tolower(itr));
 			return buffer;
-		};
+		}
 		struct strncasecmper
 		{
 			bool operator()(const char *left, const char *right, std::size_t len)

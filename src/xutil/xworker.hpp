@@ -17,8 +17,7 @@ namespace xutil
 		}
 		~xworker()
 		{
-			if(!is_stop_)
-				stop();
+			stop();
 		}
 		void add_job(job_t &&job)
 		{
@@ -27,12 +26,13 @@ namespace xutil
 		void stop()
 		{
 			is_stop_ = true;
-			job_queue_.push([] {});
-			thread_.join();
+			job_queue_.push([this] {});
+			if(thread_.joinable())
+				thread_.join();
 		}
 		bool steal_job(job_t &job)
 		{
-			return job_queue_.pop(job, 1);
+			return job_queue_.pop(job);
 		}
 		std::size_t jobs()
 		{
@@ -46,18 +46,16 @@ namespace xutil
 				while (!is_stop_)
 				{
 					job_t job;
-					if (job_queue_.pop(job, 100) || steal_job_(job))
+					if (job_queue_.pop(job) || steal_job_(job))
 					{
 						job();
 						continue;
 					}
-					std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				};
 			}
 			catch (const std::exception& e)
 			{
 				std::cout << e.what() << std::endl;
-				throw e;
 			}
 			
 		}

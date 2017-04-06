@@ -10,7 +10,7 @@ namespace xutil
 	class xworker_pool
 	{
 	public:
-		xworker_pool(std::size_t  worker_size = std::thread::hardware_concurrency())
+		xworker_pool(int worker_size = std::thread::hardware_concurrency())
 			:worker_size_(worker_size)
 		{
 			init();
@@ -49,15 +49,14 @@ namespace xutil
 			if (!is_init_done_)
 				return false;
 
-			std::vector<xworker*> tmp;
-			for (auto &itr : workers_)
+			for (std::size_t i = 0; i < workers_.size(); i++)
 			{
-				if (itr->jobs() > 0)
-					tmp.emplace_back(itr.get());
+				if (workers_[rand() % workers_.size()]->steal_job(job))
+				{
+					return true;
+				}
 			}
-			if (tmp.empty())
-				return false;
-			return tmp[rand() % tmp.size()]->steal_job(job);
+			return false;
 		}
 
 		xworker &get_worker()
@@ -67,7 +66,7 @@ namespace xutil
 
 		std::atomic<uint64_t> index_ { 0 };
 		bool is_init_done_ = false;
-		std::size_t  worker_size_;
+		uint32_t worker_size_;
 		std::vector<std::unique_ptr<xworker>> workers_;
 	};
 }

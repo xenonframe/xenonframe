@@ -14,21 +14,16 @@ namespace xutil
 
 		void push(T &&item)
 		{
-			std::lock_guard<std::mutex> locker(mtex_);
+			std::unique_lock<std::mutex> locker(mtex_);
 			queue_.push(std::forward<T>(item));
-			cv_.notify_one();
 		}
 
-		bool pop(T &job, int timeout_mills = 0)
+		bool pop(T &t)
 		{
 			std::unique_lock<std::mutex> locker(mtex_);
 			if (queue_.empty())
-			{
-				/*cv_.wait_for(locker, std::chrono::milliseconds(timeout_mills));
-				if (queue_.empty())*/
-					return false;
-			}
-			job = std::move(queue_.front());
+				return false;
+			t = std::move(queue_.front());
 			queue_.pop();
 			return true;
 		}
@@ -44,7 +39,6 @@ namespace xutil
 		}
 	private:
 		std::mutex mtex_;
-		std::condition_variable cv_;
 		std::queue<T> queue_;
 	};
 }
