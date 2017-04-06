@@ -183,9 +183,9 @@ namespace xactor
 		}
 
 		template<typename T>
-		void regist(T &&lamdba)
+		void receive(T &&lamdba)
 		{
-			return regist_impl(xutil::to_function(lamdba));
+			return receive_impl(xutil::to_function(lamdba));
 		}
 
 		xutil::timer_id set_timer(std::size_t millis, std::function<bool()> &&func)
@@ -243,7 +243,7 @@ namespace xactor
 		friend class xengine;
 
 		template<typename T>
-		void regist_impl(const std::function<void(const address &from, T &&)>& func)
+		void receive_impl(const std::function<void(const address &from, T &&)>& func)
 		{
 			auto type = get_msg_name<T>();
 			auto itr = msg_handles_.find(type);

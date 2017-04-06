@@ -38,7 +38,7 @@ namespace watch_test
 	private:
 		void regist_close_event()
 		{
-			regist([](const address &from, notify::actor_close && actor_close_){
+			receive([](const address &from, notify::actor_close && actor_close_){
 
 				std::cout << "actor close: addrress ->"<<actor_close_.address_<< std::endl;
 			});

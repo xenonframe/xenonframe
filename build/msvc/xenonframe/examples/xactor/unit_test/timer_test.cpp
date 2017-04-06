@@ -39,7 +39,7 @@ private:
 		};
 
 
-		regist([this](const address &from, mmm &&_mmm){
+		receive([this](const address &from, mmm &&_mmm){
 			msgs_++;
 		});
 

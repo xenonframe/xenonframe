@@ -22,7 +22,7 @@ public:
 	void init()
 	{
 		using xutil::to_function;
-		regist(to_function([this](const address& from, hello &&m) {
+		receive(to_function([this](const address& from, hello &&m) {
 
 			std::cout << m.data_ << std::this_thread::get_id() << std::endl;
 			send(from, world{ m });
@@ -46,7 +46,7 @@ public:
 	~monitor() {}
 	void init()
 	{
-		regist([this](const address & from, world &&w){
+		receive([this](const address & from, world &&w){
 
 			send(from, w.hello_);
 		});
