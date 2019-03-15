@@ -1,3 +1,4 @@
+#pragma once
 namespace xnet
 {
 	class proactor;

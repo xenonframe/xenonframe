@@ -1,4 +1,12 @@
 #pragma once
+
+#include <functional>
+#include <chrono>
+#include "xutil/functional.hpp"
+#include "xnet/connection.hpp"
+#include "xcoroutine/xcoroutine.hpp"
+#include "xhttp_server/middleware/redis_session/xsession.hpp"
+#include "xhttper/query.hpp"
 namespace xhttp_server
 {
 	using namespace xutil::functional;
@@ -53,7 +61,6 @@ namespace xhttp_server
 					}
 					i++;
 					body_.append(data, len);
-					std::cout << body_ << std::endl;
 					if (body_.size() == content_length())
 					{
 						resume_handle();

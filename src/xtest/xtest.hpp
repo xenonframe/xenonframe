@@ -54,7 +54,7 @@ namespace xtest
 		SetConsoleTextAttribute(hStdout, c.m_color);
 		return i;
 	}
-#elif
+#else
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -137,11 +137,11 @@ namespace xtest
 			}
 		}
 	private:
-		void SetColor(unsigned short forecolor = 4, unsigned short backgroudcolor = 0)
+		/*void SetColor(unsigned short forecolor = 4, unsigned short backgroudcolor = 0)
 		{
 			HANDLE hCon = GetStdHandle(STD_OUTPUT_HANDLE); //获取缓冲区句柄
 			SetConsoleTextAttribute(hCon, forecolor | backgroudcolor); //设置文本及背景色
-		}
+		}*/
 		std::list<test_t> tests_;
 	};
 }

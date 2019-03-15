@@ -83,5 +83,6 @@ int main()
 		itr("hello world", 1);
 	for(auto &itr: callbackN)
 		itr("hello world", 1, true, user(1));
+	std::cout<<"xcoroutine test done"<< std::endl;
 	return 0;
 }

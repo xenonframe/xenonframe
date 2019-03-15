@@ -13,7 +13,7 @@
 #include <cstdio>
 
 //deps
-#include "../xnet/xnet.hpp"
+#include "xnet/xnet.hpp"
 //end of deps
 #include "../reply_entry.hpp"
 #include "../callback_func.hpp"

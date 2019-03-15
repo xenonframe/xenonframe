@@ -555,7 +555,7 @@ namespace epoll
 				}
 				catch (const std::exception& e)
 				{
-					std::cout << e << std::endl;
+					std::cout << e.what() << std::endl;
 				}
 				
 				if(del_event_ctx_.size())

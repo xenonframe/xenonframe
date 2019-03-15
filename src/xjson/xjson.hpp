@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <initializer_list>
 #include <memory>
+#include <string.h>
 
 namespace xjson
 {
@@ -561,7 +562,7 @@ namespace xjson
 			typename T::type val;
 			try
 			{
-				val = get<T::type>();
+				val = get<typename T::type>();
 			}
 			catch (...)
 			{

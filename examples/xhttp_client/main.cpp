@@ -1,4 +1,3 @@
-#pragma once
 #include "xhttp_client/client_maker.hpp"
 #include "xhttp_client/downloader.hpp"
 #include "xtest/xtest.hpp"
